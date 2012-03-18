@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        NNM-Club Grabber plugin
-# Purpose:     Get new episodes of serials from NNM-Club.ORG
+# Purpose:     Get new episodes of serials from NNM-Club.RU
 #
 # Author:      Sychev Pavel, Volosatov Nikolay
 #
