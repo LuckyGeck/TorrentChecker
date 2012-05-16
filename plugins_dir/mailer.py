@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+﻿#-------------------------------------------------------------------------------
 # Name:        mailer
 # Purpose:      Sends Mail Notiffication from gmail acc with HTML contents
 #
@@ -9,6 +9,8 @@
 # Licence:     GNU GPL
 #-------------------------------------------------------------------------------
 #!/usr/bin/env python
+
+# -*- coding: utf-8 -*-
 
 def build_table(contents):
     beg_text = '''<html>
@@ -37,11 +39,14 @@ def sendEmail(fromaddr, password, toaddrs, html_text, mail_text):
     import email
 
 
-    mail_coding = 'windows-1251'
+    mail_coding = 'cp1251'
     multi_msg = MIMEMultipart('alternative')
     multi_msg['From'] = fromaddr
     multi_msg['To'] = toaddrs
     multi_msg['Subject'] =  'New episode of serial'
+
+    html_text = str(html_text.encode("cp1251"))
+    mail_text = str(mail_text.encode("cp1251"))
 
     html_msg = MIMEText(html_text, 'html')
     text_msg = MIMEText(mail_text, 'plain')

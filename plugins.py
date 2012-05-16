@@ -1,3 +1,4 @@
+﻿# -*- coding: utf-8 -*-
 import os
 import inspect
 import plugins_dir.base
@@ -5,7 +6,7 @@ import sys
 import imp
 from inspect import isclass
 
-def reloadPlugins(servers):
+def reloadPlugins(servers, onLoadPlugins, onNewEpisodePlugins, onFinishPlugins, settings):
     modules = []
 
     plugins_dir_str = "plugins_dir"
@@ -26,13 +27,24 @@ def reloadPlugins(servers):
             obj = getattr (module_obj, elem)
 
             if inspect.isclass(obj):
-                if issubclass(obj, plugins_dir.base.baseplugin):
-                    serverName = obj.getServerName()
-                    if (type(serverName) == type(())):
-                        for name in serverName:
-                            servers[name] = [obj,]
-                    else:
-                        servers[serverName] = [obj,]
+                try:
+                    if issubclass(obj, plugins_dir.base.serverPlugin): #server plugin
+                        serverName = obj.getServerName()
+                        if (type(serverName) == type(())):
+                            for name in serverName:
+                                servers[name] = [obj,]
+                        else:
+                            servers[serverName] = [obj,]
+                    elif issubclass(obj, plugins_dir.base.abstractAdditionalPlugin):
+                        obj = obj(settings)
+                        if issubclass(obj.__class__, plugins_dir.base.onLoadPlugin): #plugin after load
+                            onLoadPlugins.append(obj)
+                        if issubclass(obj.__class__, plugins_dir.base.onNewEpisodePlugin): #plugins on new episode found
+                            onNewEpisodePlugins.append(obj)
+                        if issubclass(obj.__class__, plugins_dir.base.onFinishPlugin): #server plugin
+                            onFinishPlugins.append(obj)
+                except:
+                    print "***Error while loading plugin [%s]***"%obj.plugin_name
     pass
 
 if __name__ == '__main__':

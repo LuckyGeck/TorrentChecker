@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+﻿#-------------------------------------------------------------------------------
 # Name:        TorrentChecker
 # Purpose:     Get new episodes of serials from different torrent trackers
 #
@@ -9,22 +9,15 @@
 # Licence:     GPL
 #-------------------------------------------------------------------------------
 #!/usr/bin/env python
-import string
-import os
-import sys
-import imp
+
+# -*- coding: utf-8 -*-
+
+import string, os
 from plugins import *
-from inspect import isclass
+from codecs import open
 
-mail_body = ''
-simple_body = ''
-
-servers = {}
-settings = {}
-
-def readSettings(path):
-    global settings
-    fileSettings = open(path, 'r')
+def readSettings(path, settings):
+    fileSettings = open(path, 'r', 'utf-8')
     info = fileSettings.readline()
     while (info != ''):
         if string.strip(info) == '':
@@ -39,17 +32,21 @@ def readSettings(path):
 
 def checkTorrentAndDownload(torrID, lastmd5, fileDir, plugin):
     fileName = fileDir%torrID
-    (md5,data) = plugin.getTorrent(torrID)
-    if md5 != lastmd5 :
-        f = open(fileName, 'wb')
-        f.write(data)
-        f.close()
-        return md5
+    try:
+        (md5,data) = plugin.getTorrent(torrID)
+
+        if md5 != lastmd5 :
+            f = open(fileName, 'wb')
+            f.write(data)
+            f.close()
+            return md5
+    except:
+        print "[% plugin] Some network error while downloading torrent file."%plugin.plugin_name
     return lastmd5
     pass
 
 def loadTorrentsList(path):
-    fileT = open(path, 'r')
+    fileT = open(path, 'r', 'utf-8')
     retList = []
     torLines = fileT.readlines()
     for s in torLines:
@@ -59,29 +56,20 @@ def loadTorrentsList(path):
             retList.append(t)
         except:
             pass
-            #retList.append(t[0], t[1], '', '')
     fileT.close()
     return retList
 
 def saveTorrentsList(torrentQueue, torLstPath):
-    f = open(torLstPath, 'w')
+    f = open(torLstPath, 'w', 'utf-8')
     for key in torrentQueue:
-        f.write('%s:%s:%s:%s\r\n'%key)
+        f.write(u'%s:%s:%s:%s\r\n'%key)
     f.close()
     pass
 
 def log(str, path):
-    f = open(path, 'a')
+    f = open(path, 'a', 'utf-8')
     f.write(str)
     f.close()
-
-def addToEmail(torrID, descr, fullDescr=''):
-    print('Updated ['+torrID+'] %s'%descr)
-    global mail_body
-    global simple_body
-    simple_body = simple_body + 'Updated '+torrID+'['+descr+']\n'
-    mail_body = mail_body + '<tr><td>Updated <b>'+torrID+'</b></td>\n<td>'+descr + '</td>\n<td>'+fullDescr+'</td></tr>\n\n'
-    pass
 
 def setProxy(url, login, password):
     passmgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -92,28 +80,58 @@ def setProxy(url, login, password):
     opener = urllib2.build_opener(proxy_support, authinfo)
     urllib2.install_opener(opener)
 
-def main():
-    global servers
-    global settings
+def processOnLoadPlugins(onLoadPlugins, torrentQueue, newTorrentQueue):
+    for plg in onLoadPlugins:
+        try:
+            plg.onLoadProcess(torrentQueue,newTorrentQueue)
+        except Exception as e:
+            print "[%s plugin] *** Error while running onLoadPlugin! *** \n*** %s ***"%(plg.plugin_name,e)
 
-    reloadPlugins(servers)
+def onNewEpisodeOccurred(onNewEpisodePlugins, torrID, descr, grabDescrFunction, server_plugin):
+    for plg in onNewEpisodePlugins:
+        try:
+            plg.onNewEpisodeProcess(torrID, descr, grabDescrFunction, server_plugin)
+        except Exception as e:
+            print "[%s plugin] *** Error while running onNewEpisodePlugin! *** \n*** %s ***"%(plg.plugin_name,e)
+
+def processOnFinishPlugins(onFinishPlugins, torrentQueue, newTorrentQueue):
+    for plg in onFinishPlugins:
+        try:
+            plg.onFinishProcess(torrentQueue,newTorrentQueue)
+        except Exception as e:
+            print "[%s plugin] *** Error while running onFinishPlugin! *** \n*** %s ***"%(plg.plugin_name,e)
+def main():
+    servers = {} #<-- server plugins
+    settings = {}
+
+    #PluginsLists:
+    onLoadPlugins = []
+    onNewEpisodePlugins = []
+    onFinishPlugins = []
+
     dirPath = os.path.dirname(__file__)
     settingPath = os.path.join(dirPath, "settings.ini")
-    readSettings(settingPath)
+    readSettings(settingPath, settings)
+
+    reloadPlugins(servers, onLoadPlugins, onNewEpisodePlugins, onFinishPlugins, settings)
 
     torLstPath = settings["torrents.list"]
+    torrentQueue = loadTorrentsList(torLstPath)
+    newTorrentQueue = []
+
+    processOnLoadPlugins(onLoadPlugins, torrentQueue, newTorrentQueue)
 
     if settings.has_key("proxy.active") and (settings["proxy.active"] == '1'):
         setProxy(settings["proxy.url"], settings["proxy.login"], settings["proxy.password"])
 
-    torrentQueue = loadTorrentsList(torLstPath)
-    newTorrentQueue = []
     for key in torrentQueue:
 
         (old_md5, descr) = key[2:]
         serv = key[0]
         torrID = key[1]
 
+        #onServerPlugin
+        ##---PROCESSING---
         if servers.has_key(key[0]) == False:
             print "No such server handler: serv_name=%s"%key[0]
             continue
@@ -126,19 +144,17 @@ def main():
             plug_list.append(plugin)
 
         new_md5 = checkTorrentAndDownload(torrID, old_md5, settings[serv+'.saveas'], plugin)
-        if new_md5 != old_md5:
-            addToEmail(torrID, descr, plugin.grabDescr(torrID))
-            if settings.has_key('twitter.active') and settings['twitter.active'] == '1':
-                os.system('ttytter -status="'+settings['twitter.msg']%descr + '"')
+        ##---END-PROCESSING---
+
+        if new_md5 != old_md5: #onNewEpisode
+            onNewEpisodeOccurred(onNewEpisodePlugins, torrID, descr, plugin.grabDescr, plugin)
 
         newTorrentQueue.append((serv, torrID, new_md5, descr))
 
-    saveTorrentsList(newTorrentQueue, torLstPath)
+    #onFinish
+    processOnFinishPlugins(onFinishPlugins, torrentQueue, newTorrentQueue)
 
-    if settings.has_key('mailer.active') and settings['mailer.active'] == '1':
-        if mail_body != '':
-            import mailer
-            mailer.sendEmail(settings['mailer.fromMail'], settings['mailer.fromPassword'], settings['mailer.toMail'], mailer.build_table(mail_body), simple_body)
+    saveTorrentsList(newTorrentQueue, torLstPath)
     pass
 
 if __name__ == '__main__':

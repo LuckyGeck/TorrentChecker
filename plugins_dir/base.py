@@ -1,8 +1,9 @@
+﻿# -*- coding: utf-8 -*-
 class Callable:
     def __init__(self, anycallable):
         self.__call__ = anycallable
 
-class baseplugin():
+class serverPlugin():
     login = ''
     password = ''
     opener = ''
@@ -26,4 +27,35 @@ class baseplugin():
         pass
 
     def getTorrent(self, torrID):
+        pass
+
+### ADDITIONAL PLUGINS ###
+
+class abstractAdditionalPlugin():
+    plugin_name = ''
+
+    def __init__(self, settings):
+        #just a stub
+        #you can get your plugins settings, if needed
+        pass
+
+    def getPluginName(self):
+        return self.plugin_name
+
+class onLoadPlugin(abstractAdditionalPlugin):
+    def onLoadProcess(self, torrentQueue, newTorrentQueue):
+        #here should be your work done
+        raise NotImplementedError
+        pass
+
+class onNewEpisodePlugin(abstractAdditionalPlugin):
+    def onNewEpisodeProcess(self, torrID, descr, grabDescrFunction, pluginObj):
+        #here should be your work done
+        raise NotImplementedError
+        pass
+
+class onFinishPlugin(abstractAdditionalPlugin):
+    def onFinishProcess(self, torrentQueue, newTorrentQueue):
+        #here should be your work done
+        raise NotImplementedError
         pass

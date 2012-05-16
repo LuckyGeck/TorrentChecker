@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+﻿#-------------------------------------------------------------------------------
 # Name:        NNM-Club Grabber plugin
 # Purpose:     Get new episodes of serials from NNM-Club.RU
 #
@@ -8,6 +8,9 @@
 # Copyright:   (c) Sychev Pavel 2012
 # Licence:     GPL
 #----------------------------
+
+# -*- coding: utf-8 -*-
+
 import base
 import urllib2
 import urllib
@@ -17,7 +20,7 @@ import hashlib
 import os
 import re
 
-class rutracker(base.baseplugin):
+class nnmclub(base.serverPlugin):
 
     plugin_name = 'nnm-club'
     post_params = ''
@@ -26,8 +29,8 @@ class rutracker(base.baseplugin):
         post_params = urllib.urlencode({
         'username' : self.login,
         'password' : self.password,
-	'autologin' : 'on',
-	'redirect' : '',
+    	'autologin' : 'on',
+    	'redirect' : '',
         'login' : '%C2%F5%EE%E4'
         })
         return post_params
@@ -41,7 +44,7 @@ class rutracker(base.baseplugin):
         c = cookielib.MozillaCookieJar('./cookies.txt')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(c))
         opener.open(loginPage, self.post_params)
-	data = opener.open(loginPage, self.post_params).read()
+    	data = opener.open(loginPage, self.post_params).read()
         #f = open("./test.html", 'wb')
         #f.write(data)
         #f.close()
@@ -56,7 +59,7 @@ class rutracker(base.baseplugin):
         return second
 
     def getTorrent(self, torrID):
-	url = 'http://nnm-club.ru/forum/viewtopic.php?t=%s'%torrID
+    	url = 'http://nnm-club.ru/forum/viewtopic.php?t=%s'%torrID
         data = self.opener.open(url, self.post_params).read()
         downloadUrl = re.search(r'download.php\?id=[^"]*', data).group()
 
@@ -68,6 +71,7 @@ class rutracker(base.baseplugin):
 
     def getServerName():
         return "nnm-club"
+
     getServerName = base.Callable(getServerName)
 
 

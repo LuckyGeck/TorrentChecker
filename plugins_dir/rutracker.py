@@ -1,4 +1,4 @@
-#-------------------------------------------------------------------------------
+﻿#-------------------------------------------------------------------------------
 # Name:        RuTracker Grabber plugin
 # Purpose:     Get new episodes of serials from RuTracker.ORG
 #
@@ -8,6 +8,9 @@
 # Copyright:   (c) Sychev Pavel 2012
 # Licence:     GPL
 #----------------------------
+
+# -*- coding: utf-8 -*-
+
 import base
 import urllib2
 import urllib
@@ -17,7 +20,7 @@ import hashlib
 import os
 import re
 
-class rutracker(base.baseplugin):
+class rutracker(base.serverPlugin):
 
     plugin_name = 'rutracker'
     post_params = ''
@@ -38,15 +41,18 @@ class rutracker(base.baseplugin):
 
         c = cookielib.MozillaCookieJar('./cookies.txt')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(c))
-        data = opener.open(loginPage, self.post_params).read()
-        #f = open("./test.html", 'wb')
-        #f.write(data)
-        #f.close()
-        print('Rutracker: auth - ok!')
+        try:
+            data = opener.open(loginPage, self.post_params).read()
+            #f = open("./test.html", 'wb')
+            #f.write(data)
+            #f.close()
+            print('Rutracker: auth - ok!')
+        except Exception as e:
+            print('Rutracker: auth - failed! [*** %s ***]'%e)
         return opener
 
     def grabDescr(self, torrID): # we get full description (grab the page)
-        url = 'http://rutracker.org/forum/viewtopic.php?t=%s'%torrID
+        url = u'http://rutracker.org/forum/viewtopic.php?t=%s'%torrID
         data = self.opener.open(url, self.post_params).read()
         first = re.search(r"<h1 class=.*", data).group()
         second = re.split(r"<[^>]*>", first)[2]
@@ -58,6 +64,7 @@ class rutracker(base.baseplugin):
         md5 = hashlib.md5()
         md5.update(data)
         return (md5.hexdigest(), data)
+
 
     def getServerName():
         return "rutracker"
