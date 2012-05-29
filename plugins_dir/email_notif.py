@@ -36,10 +36,18 @@ class email_notif(base.onNewEpisodePlugin, base.onFinishPlugin):
             self.active = False
 
     def onNewEpisodeProcess(self, torrID, descr, grabDescrFunction, pluginObj):
-        print(u'Updated [%s] %s'%(torrID,descr))
+        stroka ='Updated [%s] '%torrID
+        stroka = stroka + descr.decode("cp1252")
+        #print ('Updated [%s] %s'%(torrID,descr.decode("cp1252")))
+        try:
+            print stroka.decode("utf-8")
+        except Exception as e:
+            print "Updated [%s] ***encoding_error***"%torrID
+            descr = "***bad encoding***"
         if self.active:
             self.simple_body = '%sUpdated %s [%s]\n'%(self.simple_body, torrID, descr)
-            fullDscr = grabDescrFunction(torrID).decode("cp1251")
+            fullDscr = grabDescrFunction(torrID)
+            fullDscr = fullDscr.decode("cp1251")
             self.mail_body = (u'%s<tr><td>Updated <b>%s</b></td>\n<td>%s</td>\n<td>%s</td></tr>\n\n')%(self.mail_body, torrID, descr, fullDscr)
 
     def onFinishProcess(self, torrentQueue, newTorrentQueue):

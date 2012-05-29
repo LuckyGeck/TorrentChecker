@@ -16,6 +16,15 @@ import string, os
 from plugins import *
 from codecs import open
 
+import locale, codecs; locale.setlocale(locale.LC_ALL, '')
+
+encoding = locale.getlocale()[1]
+
+if not encoding:
+    encoding = "utf-8"
+
+import sys;reload(sys);sys.setdefaultencoding(encoding)
+
 def readSettings(path, settings):
     fileSettings = open(path, 'r', 'utf-8')
     info = fileSettings.readline()
@@ -41,7 +50,7 @@ def checkTorrentAndDownload(torrID, lastmd5, fileDir, plugin):
             f.close()
             return md5
     except:
-        print "[% plugin] Some network error while downloading torrent file."%plugin.plugin_name
+        print "[%s plugin] Some network error while downloading torrent file."%plugin.plugin_name
     return lastmd5
     pass
 
@@ -88,6 +97,11 @@ def processOnLoadPlugins(onLoadPlugins, torrentQueue, newTorrentQueue):
             print "[%s plugin] *** Error while running onLoadPlugin! *** \n*** %s ***"%(plg.plugin_name,e)
 
 def onNewEpisodeOccurred(onNewEpisodePlugins, torrID, descr, grabDescrFunction, server_plugin):
+    try:
+        descr = descr.encode("cp1251")
+    except Exception as e:
+        print "[onNewEpisodeOccurred] Convertion error!\n*** %s ***"%e
+        return
     for plg in onNewEpisodePlugins:
         try:
             plg.onNewEpisodeProcess(torrID, descr, grabDescrFunction, server_plugin)

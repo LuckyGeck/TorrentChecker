@@ -11,7 +11,6 @@
 #!/usr/bin/env python
 
 # -*- coding: utf-8 -*-
-
 def build_table(contents):
     beg_text = '''<html>
     <head></head>
@@ -19,11 +18,11 @@ def build_table(contents):
     <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#333333">
     <tr>
         <td>
-    		<table width="600" border="1" align="center" cellpadding="0" cellspacing="5" bgcolor="#ffffff">
-    		'''
+            <table width="600" border="1" align="center" cellpadding="0" cellspacing="5" bgcolor="#ffffff">
+            '''
     end_text = '''
-    		</table>
-    	</td>
+            </table>
+        </td>
        </tr>
     </table>
     </body>
@@ -32,12 +31,21 @@ def build_table(contents):
     pass
 
 def sendEmail(fromaddr, password, toaddrs, html_text, mail_text):
+    def getEncoding():
+        import locale, codecs
+        locale.setlocale(locale.LC_ALL, '')
+        encoding = locale.getlocale()[1]
+        if not encoding:
+            encoding = "utf-8"
+        return encoding    
+
     import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
     from email.header import Header
     import email
-
+    
+    encoding = getEncoding()
 
     mail_coding = 'cp1251'
     multi_msg = MIMEMultipart('alternative')
@@ -45,8 +53,8 @@ def sendEmail(fromaddr, password, toaddrs, html_text, mail_text):
     multi_msg['To'] = toaddrs
     multi_msg['Subject'] =  'New episode of serial'
 
-    html_text = str(html_text.encode("cp1251"))
-    mail_text = str(mail_text.encode("cp1251"))
+    html_text = str(html_text.encode(encoding))
+    mail_text = str(mail_text.encode(encoding))
 
     html_msg = MIMEText(html_text, 'html')
     text_msg = MIMEText(mail_text, 'plain')

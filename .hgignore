@@ -3,3 +3,4 @@ plugins_dir/*.pyc
 _unsee/
 settings.ini
 torrents.lst
+run
