@@ -1,4 +1,6 @@
-﻿#-------------------------------------------------------------------------------
+﻿# -*- coding: utf-8 -*-
+
+#-------------------------------------------------------------------------------
 # Name:        RuTracker Grabber plugin
 # Purpose:     Get new episodes of serials from RuTracker.ORG
 #
@@ -8,8 +10,6 @@
 # Copyright:   (c) Sychev Pavel 2012
 # Licence:     GPL
 #----------------------------
-
-# -*- coding: utf-8 -*-
 
 import base
 import urllib2
@@ -24,6 +24,9 @@ class rutracker(base.serverPlugin):
 
     plugin_name = 'rutracker'
     post_params = ''
+    re_title = re.compile(r"<h1 class=[^>]*><a href[^>]*>(?P<name>.*)</a")
+    re_tags = re.compile(r"<[^>].*?>")
+    re_quot = re.compile(r"&quot;")
 
     def buildPostParams(self):
         post_params = urllib.urlencode({
@@ -54,9 +57,10 @@ class rutracker(base.serverPlugin):
     def grabDescr(self, torrID): # we get full description (grab the page)
         url = u'http://rutracker.org/forum/viewtopic.php?t=%s'%torrID
         data = self.opener.open(url, self.post_params).read()
-        first = re.search(r"<h1 class=.*", data).group()
-        second = re.split(r"<[^>]*>", first)[2]
-        return second
+        title = re.search(self.re_title, data).group("name")
+        title = re.sub(self.re_tags, "", title)
+        title = re.sub(self.re_quot, '"', title)
+        return title
 
     def getTorrent(self, torrID):
         url = 'http://dl.rutracker.org/forum/dl.php?t=%s'%torrID

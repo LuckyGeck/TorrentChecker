@@ -1,4 +1,6 @@
-﻿#-------------------------------------------------------------------------------
+﻿# -*- coding: utf-8 -*-
+
+#-------------------------------------------------------------------------------
 # Name:        EmailNotification plugin
 # Purpose:
 #
@@ -8,8 +10,6 @@
 # Copyright:   (c) Sychev Pavel 2012
 # Licence:     GPL
 #----------------------------
-
-# -*- coding: utf-8 -*-
 
 import base
 class email_notif(base.onNewEpisodePlugin, base.onFinishPlugin):
@@ -37,18 +37,26 @@ class email_notif(base.onNewEpisodePlugin, base.onFinishPlugin):
 
     def onNewEpisodeProcess(self, torrID, descr, grabDescrFunction, pluginObj):
         stroka ='Updated [%s] '%torrID
-        stroka = stroka + descr.decode("cp1252")
+        stroka = stroka + descr.decode("cp1251")
         #print ('Updated [%s] %s'%(torrID,descr.decode("cp1252")))
         try:
-            print stroka.decode("utf-8")
+            descr = descr.decode("cp1251")
+        except:
+            descr = "***bad encoding***"
+
+        try:
+            print stroka
         except Exception as e:
             print "Updated [%s] ***encoding_error***"%torrID
-            descr = "***bad encoding***"
-        if self.active:
+
+        if self.active: 
             self.simple_body = '%sUpdated %s [%s]\n'%(self.simple_body, torrID, descr)
             fullDscr = grabDescrFunction(torrID)
             fullDscr = fullDscr.decode("cp1251")
-            self.mail_body = (u'%s<tr><td>Updated <b>%s</b></td>\n<td>%s</td>\n<td>%s</td></tr>\n\n')%(self.mail_body, torrID, descr, fullDscr)
+            try:
+                self.mail_body = (u'%s<tr><td>Updated <b>%s</b></td>\n<td>%s</td>\n<td>%s</td></tr>\n\n')%(self.mail_body, torrID, descr, fullDscr)
+            except:
+                print "here"
 
     def onFinishProcess(self, torrentQueue, newTorrentQueue):
         if self.mail_body != u'' and self.active:

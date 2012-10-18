@@ -1,4 +1,6 @@
-﻿#-------------------------------------------------------------------------------
+﻿# -*- coding: utf-8 -*-
+
+#-------------------------------------------------------------------------------
 # Name:        mailer
 # Purpose:      Sends Mail Notiffication from gmail acc with HTML contents
 #
@@ -10,7 +12,6 @@
 #-------------------------------------------------------------------------------
 #!/usr/bin/env python
 
-# -*- coding: utf-8 -*-
 def build_table(contents):
     beg_text = '''<html>
     <head></head>

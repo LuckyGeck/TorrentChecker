@@ -1,4 +1,6 @@
-﻿#-------------------------------------------------------------------------------
+﻿# -*- coding: utf-8 -*-
+
+#-------------------------------------------------------------------------------
 # Name:        NNM-Club Grabber plugin
 # Purpose:     Get new episodes of serials from NNM-Club.RU
 #
@@ -8,8 +10,6 @@
 # Copyright:   (c) Sychev Pavel 2012
 # Licence:     GPL
 #----------------------------
-
-# -*- coding: utf-8 -*-
 
 import base
 import urllib2

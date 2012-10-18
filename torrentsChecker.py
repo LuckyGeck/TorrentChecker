@@ -1,4 +1,6 @@
-﻿#-------------------------------------------------------------------------------
+﻿#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
 # Name:        TorrentChecker
 # Purpose:     Get new episodes of serials from different torrent trackers
 #
@@ -8,22 +10,17 @@
 # Copyright:   (c) Sychev Pavel 2012
 # Licence:     GPL
 #-------------------------------------------------------------------------------
-#!/usr/bin/env python
 
-# -*- coding: utf-8 -*-
-
-import string, os
 from plugins import *
 from codecs import open
+import string
+import os
+import sys
+import codecs
+from errLog import err_file
 
-import locale, codecs; locale.setlocale(locale.LC_ALL, '')
-
-encoding = locale.getlocale()[1]
-
-if not encoding:
-    encoding = "utf-8"
-
-import sys;reload(sys);sys.setdefaultencoding(encoding)
+#sys.stdout = open('/root/torrents_checker.log', 'a')
+sys.stderr = err_file("/shares/Projects/scripts/python/torrentChecker/error.log")
 
 def readSettings(path, settings):
     fileSettings = open(path, 'r', 'utf-8')
@@ -32,12 +29,11 @@ def readSettings(path, settings):
         if string.strip(info) == '':
             info = fileSettings.readline()
             continue
-        (first,second) = string.split(string.strip(info), '=', 2)
+        (first, second) = string.split(string.strip(info), '=', 2)
         settings[first] = second
         info = fileSettings.readline()
     # (login,password) = string.split(s, ':')
     fileSettings.close()
-    pass
 
 def checkTorrentAndDownload(torrID, lastmd5, fileDir, plugin):
     fileName = fileDir%torrID
@@ -54,8 +50,8 @@ def checkTorrentAndDownload(torrID, lastmd5, fileDir, plugin):
     return lastmd5
     pass
 
-def loadTorrentsList(path):
-    fileT = open(path, 'r', 'utf-8')
+def loadTorrentsList(path, encoding):
+    fileT = open(path, 'r', encoding)# 'utf-8')
     retList = []
     torLines = fileT.readlines()
     for s in torLines:
@@ -68,17 +64,12 @@ def loadTorrentsList(path):
     fileT.close()
     return retList
 
-def saveTorrentsList(torrentQueue, torLstPath):
-    f = open(torLstPath, 'w', 'utf-8')
+def saveTorrentsList(torrentQueue, torLstPath, encoding):
+    f = open(torLstPath, 'w', encoding)
     for key in torrentQueue:
         f.write(u'%s:%s:%s:%s\r\n'%key)
     f.close()
     pass
-
-def log(str, path):
-    f = open(path, 'a', 'utf-8')
-    f.write(str)
-    f.close()
 
 def setProxy(url, login, password):
     passmgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -130,7 +121,12 @@ def main():
     reloadPlugins(servers, onLoadPlugins, onNewEpisodePlugins, onFinishPlugins, settings)
 
     torLstPath = settings["torrents.list"]
-    torrentQueue = loadTorrentsList(torLstPath)
+
+    encoding = "cp1251"
+    if settings.has_key("torrents.list_enc"):
+        encoding = settings["torrents.list_enc"]
+
+    torrentQueue = loadTorrentsList(torLstPath, encoding)
     newTorrentQueue = []
 
     processOnLoadPlugins(onLoadPlugins, torrentQueue, newTorrentQueue)
@@ -168,7 +164,7 @@ def main():
     #onFinish
     processOnFinishPlugins(onFinishPlugins, torrentQueue, newTorrentQueue)
 
-    saveTorrentsList(newTorrentQueue, torLstPath)
+    saveTorrentsList(newTorrentQueue, torLstPath, encoding)
     pass
 
 if __name__ == '__main__':
