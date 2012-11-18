@@ -20,7 +20,7 @@ import codecs
 from errLog import err_file
 
 #sys.stdout = open('/root/torrents_checker.log', 'a')
-sys.stderr = err_file("/shares/Projects/scripts/python/torrentChecker/error.log")
+sys.stderr = err_file("/shares/Scripts/python/torrentChecker/error.log")
 
 def readSettings(path, settings):
     fileSettings = open(path, 'r', 'utf-8')
