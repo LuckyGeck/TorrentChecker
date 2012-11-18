@@ -44,7 +44,7 @@ class nnmclub(base.serverPlugin):
         c = cookielib.MozillaCookieJar('./cookies.txt')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(c))
         opener.open(loginPage, self.post_params)
-    	data = opener.open(loginPage, self.post_params).read()
+        data = opener.open(loginPage, self.post_params).read()
         #f = open("./test.html", 'wb')
         #f.write(data)
         #f.close()
@@ -59,7 +59,7 @@ class nnmclub(base.serverPlugin):
         return second
 
     def getTorrent(self, torrID):
-    	url = 'http://nnm-club.ru/forum/viewtopic.php?t=%s'%torrID
+        url = 'http://nnm-club.ru/forum/viewtopic.php?t=%s'%torrID
         data = self.opener.open(url, self.post_params).read()
         downloadUrl = re.search(r'download.php\?id=[^"]*', data).group()
 

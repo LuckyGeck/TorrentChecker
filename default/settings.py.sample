@@ -1,0 +1,31 @@
+settings = {
+    "torrents.list"	    :	"./torrents.json",
+    "torrents.list_enc"	:	"cp1251",
+
+    "rutracker.saveas"	:	"./[rutracker.org].t%s.torrent",
+    "rutracker.login"	:	"UserLogin",
+    "rutracker.password":	"UserPassword",
+
+    "nnm-club.saveas"	:	"./[nnm-club.ru].t%s.torrent",
+    "nnm-club.login"	:	"UserLogin",
+    "nnm-club.password"	:	"UserPassword",
+
+    "mailer.active"	    :	"1",
+    "mailer.fromMail"	:	"from@gmail.com",
+    "mailer.toMail"	    :	"to@gmail.com",
+    "mailer.fromPassword":	"password",
+
+    "logger.active"	    :	"1",
+    "logger.json_instead_of_text"	:	"1",
+    "logger.saveas"	    :	"./work.log",
+
+    "error_log.saveas"  :   "./error.log",
+
+    "twitter.active"	:	"0",
+    "twitter.msg"	    :	"@username, there is a new episode of %s",
+
+    "proxy.active"	    :	"0",
+    "proxy.url"	        :	"http://proxy.url:port",
+    "proxy.login"	    :	"user",
+    "proxy.password"	:	"password"
+}

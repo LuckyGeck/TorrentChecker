@@ -1,8 +1,9 @@
-.pyc$
-.log$
-plugins_dir/.*.pyc$
+\.pyc$
+\.log$
+plugins_dir/.*\.pyc$
 _unsee/
-settings.ini
-torrents.lst
+\.idea/
+torrents.json$
+settings.py$
 run
-killscr.py
+killscr.py$

@@ -13,27 +13,12 @@
 
 from plugins import *
 from codecs import open
-import string
-import os
+import json
 import sys
-import codecs
+from settings import settings
 from errLog import err_file
 
-#sys.stdout = open('/root/torrents_checker.log', 'a')
-sys.stderr = err_file("/shares/Scripts/python/torrentChecker/error.log")
-
-def readSettings(path, settings):
-    fileSettings = open(path, 'r', 'utf-8')
-    info = fileSettings.readline()
-    while (info != ''):
-        if string.strip(info) == '':
-            info = fileSettings.readline()
-            continue
-        (first, second) = string.split(string.strip(info), '=', 2)
-        settings[first] = second
-        info = fileSettings.readline()
-    # (login,password) = string.split(s, ':')
-    fileSettings.close()
+sys.stderr = err_file(settings["error_log.saveas"])
 
 def checkTorrentAndDownload(torrID, lastmd5, fileDir, plugin):
     fileName = fileDir%torrID
@@ -51,27 +36,19 @@ def checkTorrentAndDownload(torrID, lastmd5, fileDir, plugin):
     pass
 
 def loadTorrentsList(path, encoding):
-    fileT = open(path, 'r', encoding)# 'utf-8')
     retList = []
-    torLines = fileT.readlines()
-    for s in torLines:
-        s = s.strip()
-        t = s.split(':',3)
-        try:
-            retList.append(t)
-        except:
-            pass
-    fileT.close()
+    try:
+        lines = open(path, 'r', 'utf8').read()
+        retList = json.loads(lines)
+    except:
+        pass
     return retList
 
 def saveTorrentsList(torrentQueue, torLstPath, encoding):
-    f = open(torLstPath, 'w', encoding)
-    for key in torrentQueue:
-        f.write(u'%s:%s:%s:%s\r\n'%key)
-    f.close()
-    pass
+    open(torLstPath, 'w', 'utf8').write(json.dumps(torrentQueue, indent = 2, encoding=encoding, ensure_ascii=False))
 
 def setProxy(url, login, password):
+    import urllib2
     passmgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
     passmgr.add_password(None, url , login, password)
     authinfo = urllib2.ProxyBasicAuthHandler(passmgr)
@@ -105,18 +82,14 @@ def processOnFinishPlugins(onFinishPlugins, torrentQueue, newTorrentQueue):
             plg.onFinishProcess(torrentQueue,newTorrentQueue)
         except Exception as e:
             print "[%s plugin] *** Error while running onFinishPlugin! *** \n*** %s ***"%(plg.plugin_name,e)
+
 def main():
     servers = {} #<-- server plugins
-    settings = {}
 
     #PluginsLists:
     onLoadPlugins = []
     onNewEpisodePlugins = []
     onFinishPlugins = []
-
-    dirPath = os.path.dirname(__file__)
-    settingPath = os.path.join(dirPath, "settings.ini")
-    readSettings(settingPath, settings)
 
     reloadPlugins(servers, onLoadPlugins, onNewEpisodePlugins, onFinishPlugins, settings)
 
@@ -135,31 +108,33 @@ def main():
         setProxy(settings["proxy.url"], settings["proxy.login"], settings["proxy.password"])
 
     for key in torrentQueue:
-
-        (old_md5, descr) = key[2:]
-        serv = key[0]
-        torrID = key[1]
-
         #onServerPlugin
         ##---PROCESSING---
-        if servers.has_key(key[0]) == False:
+        if servers.has_key(key["tracker"]) == False:
             print "No such server handler: serv_name=%s"%key[0]
             continue
 
-        plug_list = servers[key[0]]
+        plug_list = servers[key["tracker"]]
         if len(plug_list)>1:
             plugin = plug_list[1]
         else:
             plugin = plug_list[0](settings)
             plug_list.append(plugin)
 
-        new_md5 = checkTorrentAndDownload(torrID, old_md5, settings[serv+'.saveas'], plugin)
+        new_md5 = checkTorrentAndDownload(key["id"], key["hash"], settings[key["tracker"]+'.saveas'], plugin)
         ##---END-PROCESSING---
 
-        if new_md5 != old_md5: #onNewEpisode
-            onNewEpisodeOccurred(onNewEpisodePlugins, torrID, descr, plugin.grabDescr, plugin)
+        if new_md5 != key["hash"]: #onNewEpisode
+            onNewEpisodeOccurred(onNewEpisodePlugins, key["id"], key["descr"], plugin.grabDescr, plugin)
 
-        newTorrentQueue.append((serv, torrID, new_md5, descr))
+        newTorrentQueue.append(
+            {
+                "tracker": key["tracker"],
+                "id" : key["id"],
+                "hash": new_md5,
+                "descr": key["descr"]
+            }
+        )
 
     #onFinish
     processOnFinishPlugins(onFinishPlugins, torrentQueue, newTorrentQueue)
