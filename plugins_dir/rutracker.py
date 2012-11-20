@@ -60,7 +60,7 @@ class rutracker(base.serverPlugin):
         title = re.search(self.re_title, data).group("name")
         title = re.sub(self.re_tags, "", title)
         title = re.sub(self.re_quot, '"', title)
-        return title
+        return title.decode("cp1251")
 
     def getTorrent(self, torrID):
         url = 'http://dl.rutracker.org/forum/dl.php?t=%s'%torrID

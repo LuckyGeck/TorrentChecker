@@ -42,12 +42,8 @@ def sendEmail(fromaddr, password, toaddrs, html_text, mail_text):
     import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
-    from email.header import Header
-    import email
     
     encoding = getEncoding()
-
-    mail_coding = 'cp1251'
     multi_msg = MIMEMultipart('alternative')
     multi_msg['From'] = fromaddr
     multi_msg['To'] = toaddrs

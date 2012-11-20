@@ -34,4 +34,4 @@ class twitter_notif(base.onNewEpisodePlugin):
             except:
                 print '[%s plugin] Some error in twit sending.'%self.plugin_name
 if __name__ == '__main__':
-    print 'TwitterNotification PLugin'
+    print 'TwitterNotification Plugin'

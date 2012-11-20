@@ -45,9 +45,6 @@ class nnmclub(base.serverPlugin):
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(c))
         opener.open(loginPage, self.post_params)
         data = opener.open(loginPage, self.post_params).read()
-        #f = open("./test.html", 'wb')
-        #f.write(data)
-        #f.close()
         print('NNM-Club: auth - ok!')
         return opener
 
@@ -56,7 +53,7 @@ class nnmclub(base.serverPlugin):
         data = self.opener.open(url, self.post_params).read()
         first = re.search(r"<h1 style=.*", data).group()
         second = re.split(r"<[^>]*>", first)[2]
-        return second
+        return second.decode("cp1251")
 
     def getTorrent(self, torrID):
         url = 'http://nnm-club.ru/forum/viewtopic.php?t=%s'%torrID

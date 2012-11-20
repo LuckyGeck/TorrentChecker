@@ -20,6 +20,9 @@ class email_notif(base.onNewEpisodePlugin, base.onFinishPlugin):
     mail_body = ''
     simple_body = ''
 
+## Table row
+    table_template = u'<tr><td>Updated <b>%s</b></td>\n<td>%s</td>\n<td>%s</td></tr>\n\n'
+
 ## Credits
     fromMail = ''
     fromPassword = ''
@@ -36,27 +39,16 @@ class email_notif(base.onNewEpisodePlugin, base.onFinishPlugin):
             self.active = False
 
     def onNewEpisodeProcess(self, torrID, descr, grabDescrFunction, pluginObj):
-        stroka ='Updated [%s] '%torrID
-        stroka = stroka + descr.decode("cp1251")
-        #print ('Updated [%s] %s'%(torrID,descr.decode("cp1252")))
+        stroka = u'Updated [%s] %s'%(torrID,descr)
         try:
-            descr = descr.decode("cp1251")
-        except:
-            descr = "***bad encoding***"
-
-        try:
-            print stroka
+            print stroka.encode("utf-8")
         except Exception as e:
             print "Updated [%s] ***encoding_error***"%torrID
 
         if self.active: 
-            self.simple_body = '%sUpdated %s [%s]\n'%(self.simple_body, torrID, descr)
+            self.simple_body = self.simple_body + u'Updated %s [%s]\n'%(torrID, descr)
             fullDscr = grabDescrFunction(torrID)
-            fullDscr = fullDscr.decode("cp1251")
-            try:
-                self.mail_body = (u'%s<tr><td>Updated <b>%s</b></td>\n<td>%s</td>\n<td>%s</td></tr>\n\n')%(self.mail_body, torrID, descr, fullDscr)
-            except:
-                print "here"
+            self.mail_body = self.mail_body + self.table_template%(torrID, descr, fullDscr)
 
     def onFinishProcess(self, torrentQueue, newTorrentQueue):
         if self.mail_body != u'' and self.active:

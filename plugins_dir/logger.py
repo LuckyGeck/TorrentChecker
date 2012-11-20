@@ -46,7 +46,7 @@ class logger(base.onNewEpisodePlugin, base.onFinishPlugin):
                     )
                 else:
                     timeStr = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-                    stroka = u'[%s] --- Updated [%s] %s\n'%(timeStr, torrID, descr.decode("cp1251"))
+                    stroka = u'[%s] --- Updated [%s] %s\n'%(timeStr, torrID, descr)
                     self.logList.append(stroka)
             except Exception as e:
                 print u"[%s plugin] Error while adding to log!\n***%s***"%(self.plugin_name,e)

@@ -65,11 +65,6 @@ def processOnLoadPlugins(onLoadPlugins, torrentQueue, newTorrentQueue):
             print "[%s plugin] *** Error while running onLoadPlugin! *** \n*** %s ***"%(plg.plugin_name,e)
 
 def onNewEpisodeOccurred(onNewEpisodePlugins, torrID, descr, grabDescrFunction, server_plugin):
-    try:
-        descr = descr.encode("cp1251")
-    except Exception as e:
-        print "[onNewEpisodeOccurred] Convertion error!\n*** %s ***"%e
-        return
     for plg in onNewEpisodePlugins:
         try:
             plg.onNewEpisodeProcess(torrID, descr, grabDescrFunction, server_plugin)
@@ -95,9 +90,7 @@ def main():
 
     torLstPath = settings["torrents.list"]
 
-    encoding = "cp1251"
-    if settings.has_key("torrents.list_enc"):
-        encoding = settings["torrents.list_enc"]
+    encoding = settings.get("torrents.list_enc", "cp1251")
 
     torrentQueue = loadTorrentsList(torLstPath, encoding)
     newTorrentQueue = []
