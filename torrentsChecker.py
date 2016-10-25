@@ -114,10 +114,11 @@ def main():
             plugin = plug_list[0](settings)
             plug_list.append(plugin)
 
-        new_md5 = checkTorrentAndDownload(key["id"], key["hash"], settings[key["tracker"]+'.saveas'], plugin)
+        old_md5 = key.get("hash", "")
+        new_md5 = checkTorrentAndDownload(key["id"], old_md5, settings[key["tracker"]+'.saveas'], plugin)
         ##---END-PROCESSING---
 
-        if new_md5 != key["hash"]: #onNewEpisode
+        if new_md5 != old_md5: #onNewEpisode
             onNewEpisodeOccurred(onNewEpisodePlugins, key["id"], key["descr"], plugin.grabDescr, plugin)
 
         newTorrentQueue.append(
