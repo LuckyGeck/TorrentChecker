@@ -27,11 +27,13 @@ class twitter_notif(base.onNewEpisodePlugin):
             self.logError("Wrong settings file.", e)
             self.active = False
 
-    def onNewEpisodeProcess(self, torrID, descr, grabDescrFunction, pluginObj):
+    def onNewEpisodeProcess(self, torrID, descr, pluginObj):
         if self.active:
             try:
                 import os
-                os.system('ttytter -status="{}"'.format(msg % descr))
+                url = pluginObj.getTopicURL(torrID)
+                message = self.msg % descr
+                os.system('ttytter -status="{}"'.format(message))
             except Exception as e:
                 self.logError("Some error in twit sending.", e)
 

@@ -35,7 +35,6 @@ def checkTorrentAndDownload(torrID, lastmd5, fileDir, plugin):
         msg = "[{} plugin] Some network error while downloading torrent file."
         print msg.format(plugin.plugin_name)
     return lastmd5
-    pass
 
 
 def loadTorrentsList(path, encoding):
@@ -74,12 +73,10 @@ def processOnLoadPlugins(onLoadPlugins, torrentQueue, newTorrentQueue):
             print msg.format(plg.plugin_name, e)
 
 
-def onNewEpisodeOccurred(onNewEpisodePlugins, torrID, descr,
-                         grabDescrFunction, server_plugin):
+def onNewEpisodeOccurred(onNewEpisodePlugins, torrID, descr, server_plugin):
     for plg in onNewEpisodePlugins:
         try:
-            plg.onNewEpisodeProcess(
-                torrID, descr, grabDescrFunction, server_plugin)
+            plg.onNewEpisodeProcess(torrID, descr, server_plugin)
         except Exception as e:
             msg = "[{}] Error while running onNewEpisodePlugin!\n*** {} ***"
             print msg.format(plg.plugin_name, e)
@@ -139,8 +136,7 @@ def main():
 
         if new_md5 != old_md5:  # onNewEpisode
             onNewEpisodeOccurred(onNewEpisodePlugins,
-                                 key["id"], key["descr"],
-                                 plugin.grabDescr, plugin)
+                                 key["id"], key["descr"], plugin)
 
         newTorrentQueue.append(
             {

@@ -57,13 +57,16 @@ class rutracker(base.serverPlugin):
         return opener
 
     def grabDescr(self, torrID):  # we get full description (grab the page)
-        url = u'http://{}/forum/viewtopic.php?t={}'.format(
-            self.tracker_host, torrID)
+        url = self.getTopicURL(torrID)
         data = self.opener.open(url, self.post_params).read()
         title = re.search(self.re_title, data).group("name")
         title = re.sub(self.re_tags, "", title)
         title = re.sub(self.re_quot, '"', title)
         return title.decode("cp1251")
+
+    def getTopicURL(self, torrID):
+        return u'http://{}/forum/viewtopic.php?t={}'.format(
+            self.tracker_host, torrID)
 
     def getTorrent(self, torrID):
         url = 'http://dl.{}/forum/dl.php?t={}'.format(

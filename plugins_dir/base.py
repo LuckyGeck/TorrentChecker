@@ -30,6 +30,9 @@ class serverPlugin():
     def grabDescr(self, torrID):
         pass
 
+    def getTopicURL(self, torrID):
+        pass
+
     def getTorrent(self, torrID):
         pass
 
@@ -68,7 +71,7 @@ class onLoadPlugin(abstractAdditionalPlugin):
 
 class onNewEpisodePlugin(abstractAdditionalPlugin):
 
-    def onNewEpisodeProcess(self, torrID, descr, grabDescrFunction, pluginObj):
+    def onNewEpisodeProcess(self, torrID, descr, pluginObj):
         # here should be your work done
         raise NotImplementedError
         pass

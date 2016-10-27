@@ -32,7 +32,7 @@ class logger(base.onNewEpisodePlugin, base.onFinishPlugin):
             self.logError("Wrong settings file.", e)
             self.active = False
 
-    def onNewEpisodeProcess(self, torrID, descr, grabDescrFunction, pluginObj):
+    def onNewEpisodeProcess(self, torrID, descr, pluginObj):
         if self.active:
             try:
                 if self.useJson:
@@ -41,7 +41,8 @@ class logger(base.onNewEpisodePlugin, base.onFinishPlugin):
                             "time": int(time()),
                             "id": torrID,
                             "shortDescr": descr,
-                            "fullDescr": grabDescrFunction(torrID),
+                            "fullDescr": pluginObj.grabDescr(torrID),
+                            "url": pluginObj.getTopicURL(torrID),
                             "tracker": pluginObj.plugin_name
                         }
                     )

@@ -33,12 +33,14 @@ class telegram_notif(base.onNewEpisodePlugin):
             self.logError("Wrong settings file.", e)
             self.active = False
 
-    def onNewEpisodeProcess(self, torrID, descr, grabDescrFunction, pluginObj):
+    def onNewEpisodeProcess(self, torrID, descr, pluginObj):
         if self.active:
             try:
                 import telegram
                 bot = telegram.Bot(token=self.token)
-                bot.sendMessage(chat_id=self.chat_id, text=self.msg % descr)
+                url = pluginObj.getTopicURL(torrID)
+                msg = self.msg % (descr, url)
+                bot.sendMessage(chat_id=self.chat_id, text=msg)
             except Exception as e:
                 self.logError("Some error in message sending.", e)
 

@@ -26,7 +26,7 @@ class email_notif(base.onNewEpisodePlugin, base.onFinishPlugin):
     table_template = u'''<tr>
     <td>Updated <b>{}</b></td>
     <td>{}</td>
-    <td>{}</td>
+    <td><a href="{}">{}</td>
     </tr>'''
 
 # Credits
@@ -36,7 +36,7 @@ class email_notif(base.onNewEpisodePlugin, base.onFinishPlugin):
 
     def __init__(self, settings):
         try:
-            self.active = settings[self.key('active')]
+            self.active = settings[self.key('active')] == '1'
             self.fromMail = settings[self.key('fromMail')]
             self.fromPassword = settings[self.key('fromPassword')]
             self.toMail = settings[self.key('toMail')]
@@ -44,7 +44,7 @@ class email_notif(base.onNewEpisodePlugin, base.onFinishPlugin):
             self.logError("Wrong settings file.", e)
             self.active = False
 
-    def onNewEpisodeProcess(self, torrID, descr, grabDescrFunction, pluginObj):
+    def onNewEpisodeProcess(self, torrID, descr, pluginObj):
         stroka = u'Updated [{}] {}'.format(torrID, descr)
         try:
             print stroka.encode("utf-8")
@@ -54,9 +54,10 @@ class email_notif(base.onNewEpisodePlugin, base.onFinishPlugin):
         if self.active:
             self.simple_body = self.simple_body + \
                 u'Updated {} [{}]\n'.format(torrID, descr)
-            fullDscr = grabDescrFunction(torrID)
+            fullDscr = pluginObj.grabDescr(torrID)
+            url = pluginObj.getTopicURL(torrID)
             self.mail_body = self.mail_body + \
-                self.table_template.format(torrID, descr, fullDscr)
+                self.table_template.format(torrID, descr, url, fullDscr)
 
     def onFinishProcess(self, torrentQueue, newTorrentQueue):
         if self.mail_body != u'' and self.active:

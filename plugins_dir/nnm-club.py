@@ -51,12 +51,15 @@ class nnmclub(base.serverPlugin):
         return opener
 
     def grabDescr(self, torrID):  # we get full description (grab the page)
-        url = 'http://{}/forum/viewtopic.php?t={}'.format(
-            self.tracker_host, torrID)
+        url = self.getTopicURL(torrID)
         data = self.opener.open(url, self.post_params).read()
         first = re.search(r"<h1 style=.*", data).group()
         second = re.split(r"<[^>]*>", first)[2]
         return second.decode("cp1251")
+
+    def getTopicURL(self, torrID):
+        return 'http://{}/forum/viewtopic.php?t={}'.format(
+            self.tracker_host, torrID)
 
     def getTorrent(self, torrID):
         url = 'http://{}/forum/viewtopic.php?t={}'.format(
