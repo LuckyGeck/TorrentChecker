@@ -37,7 +37,7 @@ class email_notif(base.onNewEpisodePlugin, base.onFinishPlugin):
     def __init__(self, settings):
         try:
             self.active = settings[self.key('active')]
-            self.fromMail = settings[self.key('afromMailctive')]
+            self.fromMail = settings[self.key('fromMail')]
             self.fromPassword = settings[self.key('fromPassword')]
             self.toMail = settings[self.key('toMail')]
         except Exception as e:

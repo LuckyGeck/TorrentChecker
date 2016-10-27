@@ -45,7 +45,7 @@ class abstractAdditionalPlugin():
         pass
 
     def key(self, postfix):
-        return self.plugin_name+".login"
+        return "{}.{}".format(self.plugin_name, postfix)
 
     def logMessage(self, message):
         print "[{} plugin] {}".format(self.plugin_name, message)
