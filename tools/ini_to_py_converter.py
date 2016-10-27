@@ -4,6 +4,7 @@ import json
 import string
 from codecs import open
 
+
 def readSettings(path):
     settings = {}
     fileSettings = open(path, 'r')
@@ -18,9 +19,12 @@ def readSettings(path):
     fileSettings.close()
     return settings
 
+
 def main():
     resultList = readSettings("settings.ini")
-    text = "settings = %s"%json.dumps(resultList, indent = 2, encoding="utf-8", ensure_ascii=False)
+    jsonString = json.dumps(resultList,
+                            indent=2, encoding="utf-8", ensure_ascii=False)
+    text = "settings = {}" .format(jsonString)
     open("settings.py", "w").write(text)
 
 if __name__ == '__main__':

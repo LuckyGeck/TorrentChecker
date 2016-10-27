@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 # Name:        TwitterNotification plugin
 # Purpose:
 #
@@ -13,6 +13,7 @@
 
 import base
 
+
 class twitter_notif(base.onNewEpisodePlugin):
     plugin_name = 'twitter'
     active = False
@@ -20,18 +21,19 @@ class twitter_notif(base.onNewEpisodePlugin):
 
     def __init__(self, settings):
         try:
-            self.active = (settings.has_key('%s.active'%self.plugin_name) and settings['%s.active'%self.plugin_name] == '1')
-            self.msg = settings['%s.msg'%self.plugin_name]
-        except:
-            print "[%s plugin] Wrong settings file!"%self.plugin_name
+            self.active = settings[self.key('active')] == '1'
+            self.msg = settings[self.key('msg')]
+        except Exception as e:
+            self.logError("Wrong settings file.", e)
             self.active = False
 
     def onNewEpisodeProcess(self, torrID, descr, grabDescrFunction, pluginObj):
         if self.active:
             try:
                 import os
-                os.system('ttytter -status="%s"'%(msg%descr))
-            except:
-                print '[%s plugin] Some error in twit sending.'%self.plugin_name
+                os.system('ttytter -status="{}"'.format(msg % descr))
+            except Exception as e:
+                self.logError("Some error in twit sending.", e)
+
 if __name__ == '__main__':
     print 'TwitterNotification Plugin'

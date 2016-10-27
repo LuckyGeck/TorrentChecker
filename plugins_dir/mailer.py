@@ -1,6 +1,6 @@
 ﻿# # -*- coding: utf-8 -*-
 
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 # Name:        mailer
 # Purpose:      Sends Mail Notiffication from gmail acc with HTML contents
 #
@@ -9,7 +9,8 @@
 # Created:     11.03.2012
 # Copyright:   (c) Pavel 2012
 # Licence:     GNU GPL
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
+
 
 def build_table(contents):
     beg_text = '''<html>
@@ -27,27 +28,29 @@ def build_table(contents):
     </table>
     </body>
     </html>'''
-    return beg_text + contents + end_text;
+    return beg_text + contents + end_text
     pass
+
 
 def sendEmail(fromaddr, password, toaddrs, html_text, mail_text):
     def getEncoding():
-        import locale, codecs
+        import locale
+        import codecs
         locale.setlocale(locale.LC_ALL, '')
         encoding = locale.getlocale()[1]
         if not encoding:
             encoding = "utf-8"
-        return encoding    
+        return encoding
 
     import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
-    
+
     encoding = getEncoding()
     multi_msg = MIMEMultipart('alternative')
     multi_msg['From'] = fromaddr
     multi_msg['To'] = toaddrs
-    multi_msg['Subject'] =  'New episode of serial'
+    multi_msg['Subject'] = 'New episode of serial'
 
     html_text = str(html_text.encode(encoding))
     mail_text = str(mail_text.encode(encoding))

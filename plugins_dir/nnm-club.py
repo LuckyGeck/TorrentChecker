@@ -1,6 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 
-#-------------------------------------------------------------------------------
+#-------------------------------------------------------------------------
 # Name:        NNM-Club Grabber plugin
 # Purpose:     Get new episodes of serials from NNM-Club.RU
 #
@@ -20,6 +20,7 @@ import hashlib
 import os
 import re
 
+
 class nnmclub(base.serverPlugin):
 
     plugin_name = 'nnm-club'
@@ -28,11 +29,11 @@ class nnmclub(base.serverPlugin):
 
     def buildPostParams(self):
         post_params = urllib.urlencode({
-        'username' : self.login,
-        'password' : self.password,
-    	'autologin' : 'on',
-    	'redirect' : '',
-        'login' : '%C2%F5%EE%E4'
+            'username': self.login,
+            'password': self.password,
+            'autologin': 'on',
+            'redirect': '',
+            'login': '%C2%F5%EE%E4'
         })
         return post_params
 
@@ -40,7 +41,7 @@ class nnmclub(base.serverPlugin):
 
     def getAuth(self):
         self.post_params = self.buildPostParams()
-        loginPage='http://%s/forum/login.php'%self.tracker_host
+        loginPage = 'http://{}/forum/login.php'.format(self.tracker_host)
 
         c = cookielib.MozillaCookieJar('./cookies.txt')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(c))
@@ -49,19 +50,21 @@ class nnmclub(base.serverPlugin):
         print('NNM-Club: auth - ok!')
         return opener
 
-    def grabDescr(self, torrID): # we get full description (grab the page)
-        url = 'http://%s/forum/viewtopic.php?t=%s'%(self.tracker_host, torrID)
+    def grabDescr(self, torrID):  # we get full description (grab the page)
+        url = 'http://{}/forum/viewtopic.php?t={}'.format(
+            self.tracker_host, torrID)
         data = self.opener.open(url, self.post_params).read()
         first = re.search(r"<h1 style=.*", data).group()
         second = re.split(r"<[^>]*>", first)[2]
         return second.decode("cp1251")
 
     def getTorrent(self, torrID):
-        url = 'http://%s/forum/viewtopic.php?t=%s'%(self.tracker_host,torrID)
+        url = 'http://{}/forum/viewtopic.php?t={}'.format(
+            self.tracker_host, torrID)
         data = self.opener.open(url, self.post_params).read()
-        downloadUrl = re.search(r'download.php\?id=[^"]*', data).group()
+        downloadUrl = re.search(r'download\.php\?id=[^"]*', data).group()
 
-        url = 'http://%s/forum/%s'%(self.tracker_host,downloadUrl)
+        url = 'http://{}/forum/{}'.format(self.tracker_host, downloadUrl)
         data = self.opener.open(url, self.post_params).read()
         md5 = hashlib.md5()
         md5.update(data)
