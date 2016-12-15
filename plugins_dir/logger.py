@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#-------------------------------------------------------------------------
+# ---------------------------------------
 # Name:        Logging plugin
 # Purpose:     Plugin for torrentChecker
 #
@@ -9,7 +9,7 @@
 # Created:     31.05.2012
 # Copyright:   (c) Sychev Pavel 2012
 # Licence:     GPL
-#----------------------------
+# ---------------------------------------
 
 import base
 from time import gmtime, strftime, time

@@ -16,9 +16,9 @@ from codecs import open
 import json
 import sys
 from settings import settings
-from errLog import err_file
+from log import ErrorFile
 
-sys.stderr = err_file(settings["error_log.saveas"])
+sys.stderr = ErrorFile(settings["error_log.saveas"])
 
 
 def checkTorrentAndDownload(torrID, lastmd5, fileDir, plugin):
