@@ -3,7 +3,7 @@
 from time import gmtime, strftime
 
 
-class ErrorFile():
+class ErrorFile:
 
     def __init__(self, path):
         self.launch_time = strftime("%H:%M:%S %d-%m-%Y", gmtime())

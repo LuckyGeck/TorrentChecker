@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-#-----------------------------------------
+# -----------------------------------------
 # Name:        TelegramNotification plugin
 # Purpose:
 #
@@ -9,43 +9,44 @@
 # Created:     27.10.2016
 # Copyright:   (c) Nikolay Volosatov 2016
 # Licence:     GPL
-#-----------------------------------------
+# -----------------------------------------
 
 import base
 
 
-class telegram_notif(base.onNewEpisodePlugin):
-    plugin_name = 'telegram'
-    active = False
+class TelegramNotify(base.OnNewEpisodePlugin):
     msg = ''
     token = ''
     username = ''
     chat_id = 0
 
     def __init__(self, settings):
+        base.OnNewEpisodePlugin.__init__(self, settings)
         try:
-            self.active = settings[self.key('active')]
             self.msg = settings[self.key('msg')]
             self.token = settings[self.key('token')]
             self.username = settings[self.key('username')]
             self.chat_id = settings[self.key('chat_id')]
         except Exception as e:
-            self.logError("Wrong settings file.", e)
+            self.log_error("Wrong settings file.", e)
             self.active = False
 
-    def onNewEpisodeProcess(self, torrID, descr, pluginObj):
+    def get_plugin_name(self):
+        return 'telegram'
+
+    def on_new_episode_process(self, torrent_id, description, plugin_obj):
         if self.active:
             try:
                 import telegram
                 bot = telegram.Bot(token=self.token)
-                url = pluginObj.getTopicURL(torrID)
-                msg = self.msg % (descr, url)
+                url = plugin_obj.get_topic_url(torrent_id)
+                msg = self.msg % (description, url)
                 bot.sendMessage(chat_id=self.chat_id, text=msg)
             except Exception as e:
-                self.logError("Some error in message sending.", e)
+                self.log_error("Some error in message sending.", e)
 
 
-def echoChatID(bot, update, username):
+def echo_chat_id(bot, update, username):
     chat = update.message.chat
     if chat['username'] == username:
         update.message.reply_text('Your chat_id is "{}"'.format(chat['id']))
@@ -55,8 +56,8 @@ def echoChatID(bot, update, username):
 def start_bot(token, username):
     from telegram.ext import Updater, Filters, CommandHandler
     updater = Updater(token)
-    echoFunc = lambda b, u: echoChatID(b, u, username)
-    handler = CommandHandler("torrents", echoFunc)
+    echo_func = lambda b, u: echo_chat_id(b, u, username)
+    handler = CommandHandler("torrents", echo_func)
     updater.dispatcher.add_handler(handler)
     updater.start_polling()
     print('Waiting for command "/torrents"...')

@@ -1,6 +1,6 @@
 ﻿# # -*- coding: utf-8 -*-
 
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 # Name:        mailer
 # Purpose:      Sends Mail Notiffication from gmail acc with HTML contents
 #
@@ -9,44 +9,44 @@
 # Created:     11.03.2012
 # Copyright:   (c) Pavel 2012
 # Licence:     GNU GPL
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 
 
 def build_table(contents):
-    beg_text = '''<html>
+    template = '''<html>
     <head></head>
     <body>
-    <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#333333">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0"
+        bgcolor="#333333">
     <tr>
         <td>
-            <table width="600" border="1" align="center" cellpadding="0" cellspacing="5" bgcolor="#ffffff">
-            '''
-    end_text = '''
+            <table width="600" border="1" align="center"
+                cellpadding="0" cellspacing="5" bgcolor="#ffffff">
+            {}
             </table>
         </td>
        </tr>
     </table>
     </body>
     </html>'''
-    return beg_text + contents + end_text
-    pass
+    return template.format(contents)
 
 
-def sendEmail(fromaddr, password, toaddrs, html_text, mail_text):
-    def getEncoding():
+def send_email(fromaddr, password, toaddrs, html_text, mail_text):
+    def get_encoding():
+        # type: () -> str
         import locale
-        import codecs
         locale.setlocale(locale.LC_ALL, '')
-        encoding = locale.getlocale()[1]
-        if not encoding:
-            encoding = "utf-8"
-        return encoding
+        enc = locale.getlocale()[1]
+        if not enc:
+            enc = "utf-8"
+        return enc
 
     import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
 
-    encoding = getEncoding()
+    encoding = get_encoding()
     multi_msg = MIMEMultipart('alternative')
     multi_msg['From'] = fromaddr
     multi_msg['To'] = toaddrs

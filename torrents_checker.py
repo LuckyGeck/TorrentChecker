@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 # Name:        TorrentChecker
 # Purpose:     Get new episodes of serials from different torrent trackers
 #
@@ -9,7 +9,7 @@
 # Created:     28.02.2012
 # Copyright:   (c) Sychev Pavel 2012
 # Licence:     GPL
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 
 from plugins import *
 from codecs import open
@@ -21,124 +21,123 @@ from log import ErrorFile
 sys.stderr = ErrorFile(settings["error_log.saveas"])
 
 
-def checkTorrentAndDownload(torrID, lastmd5, fileDir, plugin):
-    fileName = fileDir % torrID
+def check_torrent_and_download(torrent_id, last_md5, file_dir, plugin):
+    file_name = file_dir % torrent_id
     try:
-        (md5, data) = plugin.getTorrent(torrID)
-
-        if md5 != lastmd5:
-            f = open(fileName, 'wb')
-            f.write(data)
-            f.close()
+        (md5, data) = plugin.load_torrent(torrent_id)
+        if md5 != last_md5:
+            with open(file_name, 'wb') as torrent_file:
+                torrent_file.write(data)
             return md5
-    except:
-        msg = "[{} plugin] Some network error while downloading torrent file."
-        print msg.format(plugin.plugin_name)
-    return lastmd5
+    except Exception as e:
+        plugin.log_error(
+            'Some network error while downloading torrent file', e)
+    return last_md5
 
 
-def loadTorrentsList(path, encoding):
-    retList = []
+def load_torrents_list(path, encoding):
+    torrents_list = []
     try:
-        lines = open(path, 'r', 'utf8').read()
-        retList = json.loads(lines)
+        with open(path, 'r', 'utf8') as torrents_file:
+            torrents_list = json.load(torrents_file, encoding=encoding)
     except:
         pass
-    return retList
+    return torrents_list
 
 
-def saveTorrentsList(torrentQueue, torLstPath, encoding):
-    jsonString = json.dumps(torrentQueue,
-                            indent=2, encoding=encoding, ensure_ascii=False)
-    open(torLstPath, 'w', 'utf8').write(jsonString)
+def save_torrents_list(torrents_list, path, encoding):
+    json_string = json.dumps(torrents_list,
+                             indent=2, encoding=encoding, ensure_ascii=False)
+    with open(path, 'w', 'utf8') as torrents_file:
+        torrents_file.write(json_string)
 
 
-def setProxy(url, login, password):
+def set_proxy(url, login, password):
     import urllib2
-    passmgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-    passmgr.add_password(None, url, login, password)
-    authinfo = urllib2.ProxyBasicAuthHandler(passmgr)
+    pass_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+    pass_mgr.add_password(None, url, login, password)
+    authinfo = urllib2.ProxyBasicAuthHandler(pass_mgr)
     proxy_support = urllib2.ProxyHandler({'http': url})
 
     opener = urllib2.build_opener(proxy_support, authinfo)
     urllib2.install_opener(opener)
 
 
-def processOnLoadPlugins(onLoadPlugins, torrentQueue, newTorrentQueue):
-    for plg in onLoadPlugins:
+def process_on_load_plugins(plugins, torrents_list, new_torrents_list):
+    for plugin in plugins:
         try:
-            plg.onLoadProcess(torrentQueue, newTorrentQueue)
+            plugin.on_load_process(torrents_list, new_torrents_list)
         except Exception as e:
-            msg = "[{}] Error while running onLoadPlugin!\n*** {} ***"
-            print msg.format(plg.plugin_name, e)
+            plugin.log_error('Error while running on_load_process', e)
 
 
-def onNewEpisodeOccurred(onNewEpisodePlugins, torrID, descr, server_plugin):
-    for plg in onNewEpisodePlugins:
+def process_on_new_episode_occurred(plugins,
+                                    torrent_id, description, server_plugin):
+    for plugin in plugins:
         try:
-            plg.onNewEpisodeProcess(torrID, descr, server_plugin)
+            plugin.on_new_episode_process(torrent_id,
+                                          description, server_plugin)
         except Exception as e:
-            msg = "[{}] Error while running onNewEpisodePlugin!\n*** {} ***"
-            print msg.format(plg.plugin_name, e)
+            plugin.log_error('Error while running on_new_episode_process', e)
 
 
-def processOnFinishPlugins(onFinishPlugins, torrentQueue, newTorrentQueue):
-    for plg in onFinishPlugins:
+def process_on_finish_plugins(plugins, torrents_list, new_torrents_list):
+    for plugin in plugins:
         try:
-            plg.onFinishProcess(torrentQueue, newTorrentQueue)
+            plugin.on_finish_process(torrents_list, new_torrents_list)
         except Exception as e:
-            msg = "[{}] Error while running onFinishPlugin!\n*** {} ***"
-            print msg.format(plg.plugin_name, e)
+            plugin.log_error('Error while running on_finish_process', e)
 
 
 def main():
     servers = {}  # <-- server plugins
 
     # PluginsLists:
-    onLoadPlugins = []
-    onNewEpisodePlugins = []
-    onFinishPlugins = []
+    on_load_plugins = []
+    on_new_episode_plugins = []
+    on_finish_plugins = []
 
-    reloadPlugins(
-        servers, onLoadPlugins, onNewEpisodePlugins, onFinishPlugins, settings)
+    reload_plugins(servers,
+                   on_load_plugins, on_new_episode_plugins, on_finish_plugins,
+                   settings)
 
-    torLstPath = settings["torrents.list"]
+    torrents_list_path = settings["torrents.list"]
 
     encoding = settings.get("torrents.list_enc", "cp1251")
 
-    torrentQueue = loadTorrentsList(torLstPath, encoding)
-    newTorrentQueue = []
+    torrents_list = load_torrents_list(torrents_list_path, encoding)
+    new_torrents_list = []
 
-    processOnLoadPlugins(onLoadPlugins, torrentQueue, newTorrentQueue)
+    process_on_load_plugins(on_load_plugins, torrents_list, new_torrents_list)
 
-    if settings.has_key("proxy.active") and (settings["proxy.active"] == '1'):
-        setProxy(settings["proxy.url"], settings[
-                 "proxy.login"], settings["proxy.password"])
+    if settings.get("proxy.active", '0') == '1':
+        try:
+            set_proxy(settings["proxy.url"],
+                      settings["proxy.login"],
+                      settings["proxy.password"])
+        except:
+            pass
 
-    for key in torrentQueue:
+    for key in torrents_list:
         # onServerPlugin
         # ---PROCESSING---
-        if servers.has_key(key["tracker"]) == False:
-            print "No such server handler: serv_name={}".format(key[0])
+        if key["tracker"] not in servers:
+            print "No such server handler: serv_name={}".format(key["tracker"])
             continue
 
-        plug_list = servers[key["tracker"]]
-        if len(plug_list) > 1:
-            plugin = plug_list[1]
-        else:
-            plugin = plug_list[0](settings)
-            plug_list.append(plugin)
+        plugin = servers[key["tracker"]]
 
         old_md5 = key.get("hash", "")
-        new_md5 = checkTorrentAndDownload(
-            key["id"], old_md5, settings[key["tracker"]+'.saveas'], plugin)
+        save_as = settings[key["tracker"]+'.saveas']
+        new_md5 = check_torrent_and_download(key["id"],  old_md5,
+                                             save_as, plugin)
         # ---END-PROCESSING---
 
         if new_md5 != old_md5:  # onNewEpisode
-            onNewEpisodeOccurred(onNewEpisodePlugins,
-                                 key["id"], key["descr"], plugin)
+            process_on_new_episode_occurred(on_new_episode_plugins,
+                                            key["id"], key["descr"], plugin)
 
-        newTorrentQueue.append(
+        new_torrents_list.append(
             {
                 "tracker": key["tracker"],
                 "id": key["id"],
@@ -148,10 +147,10 @@ def main():
         )
 
     # onFinish
-    processOnFinishPlugins(onFinishPlugins, torrentQueue, newTorrentQueue)
+    process_on_finish_plugins(on_finish_plugins,
+                              torrents_list, new_torrents_list)
 
-    saveTorrentsList(newTorrentQueue, torLstPath, encoding)
-    pass
+    save_torrents_list(new_torrents_list, torrents_list_path, encoding)
 
 if __name__ == '__main__':
     main()
