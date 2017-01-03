@@ -55,8 +55,8 @@ class EmailNotify(base.OnNewEpisodePlugin, base.OnFinishPlugin):
 
         if self.active:
             self.simple_body += message + '\n'
-            full_description = plugin_obj.grabDescr(torrent_id)
-            url = plugin_obj.getTopicURL(torrent_id)
+            full_description = plugin_obj.load_description(torrent_id)
+            url = plugin_obj.get_topic_url(torrent_id)
             self.mail_body += self.table_template.format(**locals())
 
     def on_finish_process(self, torrent_queue, new_torrent_queue):
