@@ -46,18 +46,18 @@ class TelegramNotify(base.OnNewEpisodePlugin):
                 self.log_error("Some error in message sending.", e)
 
 
-def echo_chat_id(bot, update, username):
-    chat = update.message.chat
-    if chat['username'] == username:
-        update.message.reply_text('Your chat_id is "{}"'.format(chat['id']))
-        exit(0)
-
-
 def start_bot(token, username):
-    from telegram.ext import Updater, Filters, CommandHandler
+    from telegram.ext import Updater, CommandHandler
     updater = Updater(token)
-    echo_func = lambda b, u: echo_chat_id(b, u, username)
-    handler = CommandHandler("torrents", echo_func)
+
+    def echo(bot, update):
+        chat = update.message.chat
+        if chat['username'] == username:
+            msg = 'Your chat_id is "{}"'.format(chat['id'])
+            update.message.reply_text(msg)
+            exit(0)
+    handler = CommandHandler("torrents", echo)
+
     updater.dispatcher.add_handler(handler)
     updater.start_polling()
     print('Waiting for command "/torrents"...')
@@ -74,6 +74,7 @@ def main():
         print 'Usage: telegram_notif.py [token] [username]'
         exit(2)
     start_bot(token, username)
+
 
 if __name__ == '__main__':
     main()

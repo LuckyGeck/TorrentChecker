@@ -41,11 +41,11 @@ class RuTracker(base.ServerPlugin):
         })
 
     def get_auth(self):
-        loginPage = 'http://login.{}/forum/login.php'.format(self.tracker_host)
+        login_url = 'http://login.{}/forum/login.php'.format(self.tracker_host)
         cookies = cookielib.MozillaCookieJar('./cookies.txt')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
-        opener.open(loginPage, self.get_auth_params()).read()
-        print('Rutracker: auth - ok!')
+        opener.open(login_url, self.get_auth_params()).read()
+        print('RuTracker: auth - ok!')
         return opener
 
     def load_description(self, torrent_id):

@@ -29,13 +29,12 @@ class TwitterNotify(base.OnNewEpisodePlugin):
         return 'twitter'
 
     def on_new_episode_process(self, torrent_id, description, plugin_obj):
-        if self.active:
-            try:
-                import os
-                message = self.msg % description
-                os.system('ttytter -status="{}"'.format(message))
-            except Exception as e:
-                self.log_error("Some error in twit sending.", e)
+        try:
+            import os
+            message = self.msg % description
+            os.system('ttytter -status="{}"'.format(message))
+        except Exception as e:
+            self.log_error("Some error in twit sending.", e)
 
 if __name__ == '__main__':
     print 'TwitterNotification Plugin'

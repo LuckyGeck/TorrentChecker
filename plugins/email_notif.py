@@ -53,14 +53,13 @@ class EmailNotify(base.OnNewEpisodePlugin, base.OnFinishPlugin):
         except Exception as e:
             self.log_error("encoding_error", e)
 
-        if self.active:
-            self.simple_body += message + '\n'
-            full_description = plugin_obj.load_description(torrent_id)
-            url = plugin_obj.get_topic_url(torrent_id)
-            self.mail_body += self.table_template.format(**locals())
+        self.simple_body += message + '\n'
+        full_description = plugin_obj.load_description(torrent_id)
+        url = plugin_obj.get_topic_url(torrent_id)
+        self.mail_body += self.table_template.format(**locals())
 
-    def on_finish_process(self, torrent_queue, new_torrent_queue):
-        if self.active and self.mail_body != u'':
+    def on_finish_process(self):
+        if self.mail_body != u'':
             try:
                 import mailer
                 mailer.send_email(self.from_mail, self.from_password,

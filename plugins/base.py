@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 
 class BasePlugin:
@@ -24,13 +24,14 @@ class BasePlugin:
 class ServerPlugin(BasePlugin):
     login = ''
     password = ''
-    opener = ''
+    opener = None
+    filename_template = '%s.torrent'
 
     def __init__(self, settings):
         BasePlugin.__init__(self, settings)
         self.login = settings.get(self.key('login'))
         self.password = settings.get(self.key('password'))
-        self.opener = self.get_auth()
+        self.filename_template = settings.get(self.key('saveas'))
 
     def get_server_name(self):
         pass
@@ -41,6 +42,10 @@ class ServerPlugin(BasePlugin):
     def get_topic_url(self, torrent_id):
         pass
 
+    def authorize(self):
+        if not self.opener:
+            self.opener = self.get_auth()
+
     def load_description(self, torrent_id):
         pass
 
@@ -50,7 +55,7 @@ class ServerPlugin(BasePlugin):
 
 class OnLoadPlugin(BasePlugin):
 
-    def on_load_process(self, torrent_queue, new_torrent_queue):
+    def on_load_process(self):
         raise NotImplementedError
 
 
@@ -62,5 +67,5 @@ class OnNewEpisodePlugin(BasePlugin):
 
 class OnFinishPlugin(BasePlugin):
 
-    def on_finish_process(self, torrent_queue, new_torrent_queue):
+    def on_finish_process(self):
         raise NotImplementedError
