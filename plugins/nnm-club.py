@@ -27,7 +27,7 @@ class NNMClub(base.ServerPlugin):
         return 'nnm-club'
 
     def get_server_name(self):
-        return self.get_plugin_name()
+        return 'nnm-club', 'nnmclub'
 
     def get_auth_params(self):
         return urllib.urlencode({
@@ -39,11 +39,12 @@ class NNMClub(base.ServerPlugin):
         })
 
     def get_auth(self):
+        self.log_debug('Auth...')
         login_page = 'http://{}/forum/login.php'.format(self.tracker_host)
         cookies = cookielib.MozillaCookieJar('./cookies.txt')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
         opener.open(login_page, self.get_auth_params()).read()
-        print('NNM-Club: auth - ok!')
+        self.log_debug('Auth - ok!')
         return opener
 
     def load_description(self, torrent_id):
@@ -58,6 +59,7 @@ class NNMClub(base.ServerPlugin):
             self.tracker_host, torrent_id)
 
     def load_torrent(self, torrent_id):
+        self.log_debug('Loading torrent {}'.format(torrent_id))
         topic_url = self.get_topic_url(torrent_id)
         data = self.opener.open(topic_url, self.post_params).read()
         download_url = re.search(r'download\.php\?id=[^"]*', data).group()

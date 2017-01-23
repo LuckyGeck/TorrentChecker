@@ -20,7 +20,6 @@ import re
 
 
 class RuTracker(base.ServerPlugin):
-
     post_params = ''
     tracker_host = 'rutracker.org'
     re_title = re.compile(r"<h1 class=[^>]*><a href[^>]*>(?P<name>.*)</a")
@@ -41,11 +40,12 @@ class RuTracker(base.ServerPlugin):
         })
 
     def get_auth(self):
+        self.log_debug('Auth...')
         login_url = 'http://login.{}/forum/login.php'.format(self.tracker_host)
         cookies = cookielib.MozillaCookieJar('./cookies.txt')
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
         opener.open(login_url, self.get_auth_params()).read()
-        print('RuTracker: auth - ok!')
+        self.log_debug('Auth - ok!')
         return opener
 
     def load_description(self, torrent_id):
@@ -61,6 +61,7 @@ class RuTracker(base.ServerPlugin):
             self.tracker_host, torrent_id)
 
     def load_torrent(self, torrent_id):
+        self.log_debug('Loading torrent {}'.format(torrent_id))
         url = 'http://dl.{}/forum/dl.php?t={}'.format(
             self.tracker_host, torrent_id)
         data = self.opener.open(url, self.post_params).read()
