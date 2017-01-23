@@ -43,16 +43,16 @@ def process_torrent(torrent):
         plugin.authorize()
 
         torrent_id = torrent["id"]
+        description = torrent.get("descr")
         old_md5 = torrent.get("hash", "")
         (new_md5, data) = plugin.load_torrent(torrent_id)
 
         if new_md5 != old_md5:
-            print "New: {}".format(torrent.get("descr"))
+            print "Updated [{}] {}".format(torrent_id, description)
             file_name = plugin.filename_template % torrent_id
             with open(file_name, 'wb') as torrent_file:
                 torrent_file.write(data)
-            plugins.process_on_new_episode_occurred(torrent["id"],
-                                                    torrent["descr"], plugin)
+            plugins.process_on_new_torrent(torrent_id, description, plugin)
             new_torrent["hash"] = new_md5
     return new_torrent
 
@@ -66,7 +66,7 @@ def main():
     torrents_list = load_torrents_list(torrents_list_path, encoding)
     new_torrents_list = []
 
-    plugins.process_on_load_plugins()
+    plugins.process_on_start()
 
     for torrent in torrents_list:
         new_torrent = torrent
@@ -76,7 +76,7 @@ def main():
             print 'Torrent processing failure: {}'.format(torrent)
         new_torrents_list.append(new_torrent)
 
-    plugins.process_on_finish_plugins()
+    plugins.process_on_finish()
 
     save_torrents_list(new_torrents_list, torrents_list_path, encoding)
 

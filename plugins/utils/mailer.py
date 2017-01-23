@@ -2,7 +2,7 @@
 
 # -------------------------------------------------------------------------
 # Name:        mailer
-# Purpose:      Sends Mail Notiffication from gmail acc with HTML contents
+# Purpose:      Sends Mail Notiffication from mail acc with HTML contents
 #
 # Author:      Pavel Sychev
 #
@@ -32,28 +32,16 @@ def build_table(contents):
     return template.format(contents)
 
 
-def send_email(fromaddr, password, toaddrs, html_text, mail_text):
-    def get_encoding():
-        # type: () -> str
-        import locale
-        locale.setlocale(locale.LC_ALL, '')
-        enc = locale.getlocale()[1]
-        if not enc:
-            enc = "utf-8"
-        return enc
-
+def send_email(smtp_host, is_ssl, is_tls,
+               from_addr, password, to_addr, html_text, mail_text):
     import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
 
-    encoding = get_encoding()
     multi_msg = MIMEMultipart('alternative')
-    multi_msg['From'] = fromaddr
-    multi_msg['To'] = toaddrs
-    multi_msg['Subject'] = 'New episode of serial'
-
-    html_text = str(html_text.encode(encoding))
-    mail_text = str(mail_text.encode(encoding))
+    multi_msg['From'] = from_addr
+    multi_msg['To'] = to_addr
+    multi_msg['Subject'] = 'New episodes to watch'
 
     html_msg = MIMEText(html_text, 'html')
     text_msg = MIMEText(mail_text, 'plain')
@@ -61,12 +49,17 @@ def send_email(fromaddr, password, toaddrs, html_text, mail_text):
     multi_msg.attach(text_msg)
     multi_msg.attach(html_msg)
 
-    server = smtplib.SMTP('smtp.gmail.com:587')
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
-    server.login(fromaddr, password)
-    server.sendmail(fromaddr, toaddrs, multi_msg.as_string())
+    if is_ssl:
+        server = smtplib.SMTP_SSL(smtp_host, timeout=10)
+    else:
+        server = smtplib.SMTP(smtp_host, timeout=10)
+
+    if is_tls:
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+    server.login(from_addr, password)
+    server.sendmail(from_addr, to_addr, multi_msg.as_string())
     server.quit()
     print 'Message sent!'
 
@@ -77,4 +70,4 @@ if __name__ == '__main__':
     creating body table:
     html_body = mailer.build_table(mail_body)
     ...
-    mailer.sendEmail('FromMail', 'FromPassword', 'ToMail', html_body, simple_text_body)'''
+    mailer.sendEmail('SMTPHost', 'FromMail', 'FromPassword', 'ToMail', html_body, simple_text_body)'''

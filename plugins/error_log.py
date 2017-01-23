@@ -34,19 +34,15 @@ class ErrorFile:
         self.out.write(*args)
 
 
-class ErrorLog(base.OnLoadPlugin):
+class ErrorLog(base.OnStartPlugin):
 
     def __init__(self, settings):
-        base.OnLoadPlugin.__init__(self, settings)
-        try:
-            self.save_as = settings[self.key('saveas')]
-        except Exception as e:
-            self.log_error("Wrong settings file.", e)
-            self.active = False
+        base.OnStartPlugin.__init__(self, settings)
+        self.save_as = settings[self.key('saveas')]
 
     def get_plugin_name(self):
         return 'error_log'
 
-    def on_load_process(self):
+    def on_start_process(self):
         import sys
         sys.stderr = ErrorFile(self.save_as)

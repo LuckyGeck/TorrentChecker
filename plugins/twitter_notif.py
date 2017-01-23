@@ -14,11 +14,11 @@
 import base
 
 
-class TwitterNotify(base.OnNewEpisodePlugin):
+class TwitterNotify(base.OnNewTorrentPlugin):
     msg = ''
 
     def __init__(self, settings):
-        base.OnNewEpisodePlugin.__init__(self, settings)
+        base.OnNewTorrentPlugin.__init__(self, settings)
         try:
             self.msg = settings[self.key('msg')]
         except Exception as e:
@@ -28,7 +28,7 @@ class TwitterNotify(base.OnNewEpisodePlugin):
     def get_plugin_name(self):
         return 'twitter'
 
-    def on_new_episode_process(self, torrent_id, description, plugin_obj):
+    def on_new_torrent_process(self, torrent_id, description, plugin_obj):
         try:
             import os
             message = self.msg % description

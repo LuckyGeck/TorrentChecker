@@ -14,7 +14,7 @@
 import base
 
 
-class EmailNotify(base.OnNewEpisodePlugin, base.OnFinishPlugin):
+class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
     # Current mail bodies
     mail_body = ''
     simple_body = ''
@@ -28,46 +28,43 @@ class EmailNotify(base.OnNewEpisodePlugin, base.OnFinishPlugin):
     </tr>'''
 
     # Credentials
+    smtp_host = ''
     from_mail = ''
     from_password = ''
     to_mail = ''
 
     def __init__(self, settings):
-        base.OnNewEpisodePlugin.__init__(self, settings)
+        base.OnNewTorrentPlugin.__init__(self, settings)
         base.OnFinishPlugin.__init__(self, settings)
-        try:
-            self.from_mail = settings[self.key('fromMail')]
-            self.from_password = settings[self.key('fromPassword')]
-            self.to_mail = settings[self.key('toMail')]
-        except Exception as e:
-            self.log_error("Wrong settings file.", e)
-            self.active = False
+        self.smtp_host = settings[self.key('smtp_host')]
+        self.is_ssl = settings[self.key('ssl')] == '1'
+        self.is_tls = settings[self.key('tls')] == '1'
+        self.from_mail = settings[self.key('fromMail')]
+        self.from_password = settings[self.key('fromPassword')]
+        self.to_mail = settings[self.key('toMail')]
 
     def get_plugin_name(self):
         return 'mailer'
 
-    def on_new_episode_process(self, torrent_id, description, plugin_obj):
+    def on_new_torrent_process(self, torrent_id, description, plugin_obj):
         message = self.message_template.format(**locals())
-        try:
-            print message.encode("utf-8")
-        except Exception as e:
-            self.log_error("encoding_error", e)
 
         self.simple_body += message + '\n'
         full_description = plugin_obj.load_description(torrent_id)
         url = plugin_obj.get_topic_url(torrent_id)
-        self.mail_body += self.table_template.format(**locals())
+        body = self.table_template.format(**locals()).encode('utf-8')
+        self.mail_body += body
 
     def on_finish_process(self):
-        if self.mail_body != u'':
-            try:
-                import mailer
-                mailer.send_email(self.from_mail, self.from_password,
-                                  self.to_mail,
-                                  mailer.build_table(self.mail_body),
-                                  self.simple_body)
-            except Exception as e:
-                self.log_error("Some error in mail sending.", e)
+        if len(self.mail_body) == 0:
+            self.log_debug('Nothing to send')
+            return
+        from plugins.utils import mailer
+        full_body = mailer.build_table(self.mail_body)
+        mailer.send_email(self.smtp_host, self.is_ssl, self.is_tls,
+                          self.from_mail, self.from_password,
+                          self.to_mail, full_body, self.simple_body)
+        self.log_debug('Email sent')
 
 
 if __name__ == '__main__':

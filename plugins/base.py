@@ -6,12 +6,17 @@ class BasePlugin:
 
     def __init__(self, settings):
         self.active = settings.get(self.key('active'), '0') == '1'
+        self.debug = settings.get(self.key('debug'), '0') == '1'
 
     def key(self, key_name):
         return "{}.{}".format(self.get_plugin_name(), key_name)
 
     def log_message(self, message):
         print "[{} plugin] {}".format(self.get_plugin_name(), message)
+
+    def log_debug(self, message):
+        if self.debug:
+            self.log_message(message)
 
     def log_error(self, message, error):
         print "[{} plugin] {}\n*** {} ***".format(
@@ -53,15 +58,15 @@ class ServerPlugin(BasePlugin):
         pass
 
 
-class OnLoadPlugin(BasePlugin):
+class OnStartPlugin(BasePlugin):
 
-    def on_load_process(self):
+    def on_start_process(self):
         raise NotImplementedError
 
 
-class OnNewEpisodePlugin(BasePlugin):
+class OnNewTorrentPlugin(BasePlugin):
 
-    def on_new_episode_process(self, torrent_id, description, plugin_obj):
+    def on_new_torrent_process(self, torrent_id, description, plugin_obj):
         raise NotImplementedError
 
 

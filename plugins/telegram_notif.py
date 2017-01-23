@@ -14,27 +14,23 @@
 import base
 
 
-class TelegramNotify(base.OnNewEpisodePlugin):
+class TelegramNotify(base.OnNewTorrentPlugin):
     msg = ''
     token = ''
     username = ''
     chat_id = 0
 
     def __init__(self, settings):
-        base.OnNewEpisodePlugin.__init__(self, settings)
-        try:
-            self.msg = settings[self.key('msg')]
-            self.token = settings[self.key('token')]
-            self.username = settings[self.key('username')]
-            self.chat_id = settings[self.key('chat_id')]
-        except Exception as e:
-            self.log_error("Wrong settings file.", e)
-            self.active = False
+        base.OnNewTorrentPlugin.__init__(self, settings)
+        self.msg = settings[self.key('msg')]
+        self.token = settings[self.key('token')]
+        self.username = settings[self.key('username')]
+        self.chat_id = settings[self.key('chat_id')]
 
     def get_plugin_name(self):
         return 'telegram'
 
-    def on_new_episode_process(self, torrent_id, description, plugin_obj):
+    def on_new_torrent_process(self, torrent_id, description, plugin_obj):
         if self.active:
             try:
                 import telegram

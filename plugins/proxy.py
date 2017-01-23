@@ -14,22 +14,18 @@
 import base
 
 
-class Proxy(base.OnLoadPlugin):
+class Proxy(base.OnStartPlugin):
 
     def __init__(self, settings):
-        base.OnLoadPlugin.__init__(self, settings)
-        try:
-            self.url = settings[self.key('url')]
-            self.login = settings[self.key('login')]
-            self.password = settings[self.key('password')]
-        except Exception as e:
-            self.log_error("Wrong settings file.", e)
-            self.active = False
+        base.OnStartPlugin.__init__(self, settings)
+        self.url = settings[self.key('url')]
+        self.login = settings[self.key('login')]
+        self.password = settings[self.key('password')]
 
     def get_plugin_name(self):
         return 'proxy'
 
-    def on_load_process(self):
+    def on_start_process(self):
         import urllib2
         pass_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
         pass_mgr.add_password(None, self.url, self.login, self.password)

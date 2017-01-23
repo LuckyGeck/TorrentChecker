@@ -13,6 +13,9 @@ settings = {
     "nnm-club.password" :   "UserPassword",
 
     "mailer.active"     :   "0",
+    "mailer.smtp_host"  :   "smtp.gmail.com:587",
+    "mailer.ssl"        :   "0",
+    "mailer.tls"        :   "1",
     "mailer.fromMail"   :   "from@gmail.com",
     "mailer.toMail"     :   "to@gmail.com",
     "mailer.fromPassword":  "password",

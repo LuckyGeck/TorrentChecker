@@ -16,25 +16,21 @@ from time import gmtime, strftime, time
 import codecs
 
 
-class Logger(base.OnNewEpisodePlugin, base.OnFinishPlugin):
+class Logger(base.OnNewTorrentPlugin, base.OnFinishPlugin):
     log_path = 'logger.log'
     use_json = False  # text repr by default
     log_list = []
 
     def __init__(self, settings):
-        base.OnNewEpisodePlugin.__init__(self, settings)
+        base.OnNewTorrentPlugin.__init__(self, settings)
         base.OnFinishPlugin.__init__(self, settings)
-        try:
-            self.log_path = settings[self.key('saveas')]
-            self.use_json = settings[self.key('json_instead_of_text')]
-        except Exception as e:
-            self.log_error("Wrong settings file.", e)
-            self.active = False
+        self.log_path = settings[self.key('saveas')]
+        self.use_json = settings[self.key('json_instead_of_text')]
 
     def get_plugin_name(self):
         return 'logger'
 
-    def on_new_episode_process(self, torrent_id, description, plugin_obj):
+    def on_new_torrent_process(self, torrent_id, description, plugin_obj):
         if self.use_json:
             self.log_list.append({
                 "time": int(time()),
