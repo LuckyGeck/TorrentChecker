@@ -1,15 +1,9 @@
-﻿# # -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
-# -------------------------------------------------------------------------
-# Name:        mailer
-# Purpose:      Sends Mail Notiffication from mail acc with HTML contents
-#
-# Author:      Pavel Sychev
-#
-# Created:     11.03.2012
-# Copyright:   (c) Pavel 2012
-# Licence:     GNU GPL
-# -------------------------------------------------------------------------
+# Author:       Sychev Pavel
+# Created:      11.03.2012
+# Copyright:    (c) Sychev Pavel 2017
+# Licence:      GPL
 
 
 def build_table(contents):

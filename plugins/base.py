@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+# Author:       Sychev Pavel, Nikolay Volosatov
+# Created:      18.03.2012
+# Copyright:    (c) Sychev Pavel 2017
+# Licence:      GPL
+
 
 class BasePlugin:
     active = False

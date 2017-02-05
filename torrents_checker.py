@@ -1,15 +1,10 @@
 ﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# -------------------------------------------------------------------------
-# Name:        TorrentChecker
-# Purpose:     Get new episodes of serials from different torrent trackers
-#
-# Author:      Sychev Pavel
-#
-# Created:     28.02.2012
-# Copyright:   (c) Sychev Pavel 2012
-# Licence:     GPL
-# -------------------------------------------------------------------------
+
+# Author:       Sychev Pavel
+# Created:      28.02.2012
+# Copyright:    (c) Sychev Pavel 2017
+# Licence:      GPL
 
 from plugins import plugins
 from codecs import open
@@ -43,7 +38,7 @@ def process_torrent(torrent, save_as_tamplate):
         plugin.authorize()
 
         torrent_id = torrent["id"]
-        description = torrent.get("descr")
+        description = torrent.get("description")
         old_md5 = torrent.get("hash", "")
         (new_md5, data) = plugin.load_torrent(torrent_id)
 

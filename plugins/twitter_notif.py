@@ -1,15 +1,9 @@
 ﻿# -*- coding: utf-8 -*-
 
-# ----------------------------------------
-# Name:        TwitterNotification plugin
-# Purpose:
-#
-# Author:      Sychev Pavel
-#
-# Created:     15.05.2012
-# Copyright:   (c) Sychev Pavel 2012
-# Licence:     GPL
-# ----------------------------------------
+# Author:       Sychev Pavel
+# Created:      15.05.2012
+# Copyright:    (c) Sychev Pavel 2017
+# Licence:      GPL
 
 import base
 

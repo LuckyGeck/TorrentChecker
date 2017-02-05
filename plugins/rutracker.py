@@ -1,15 +1,9 @@
 ﻿# -*- coding: utf-8 -*-
 
-# -------------------------------------------------------------------------
-# Name:        RuTracker Grabber plugin
-# Purpose:     Get new episodes of serials from RuTracker.ORG
-#
-# Author:      Sychev Pavel
-#
-# Created:     28.02.2012
-# Copyright:   (c) Sychev Pavel 2012
-# Licence:     GPL
-# -------------------------------------------------------------------------
+# Author:       Sychev Pavel
+# Created:      28.02.2012
+# Copyright:    (c) Sychev Pavel 2017
+# Licence:      GPL
 
 import base
 import urllib2

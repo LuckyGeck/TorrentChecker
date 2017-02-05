@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+# Author:       Nikolay Volosatov
+# Created:      03.01.2017
+# Copyright:    (c) Sychev Pavel 2017
+# Licence:      GPL
+
 
 def _load_modules():
     import os

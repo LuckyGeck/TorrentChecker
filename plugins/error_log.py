@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# ----------------------------------------------------------
-# Name:        Error logging plugin
-# Purpose:     Plugin for torrentChecker
-#
-# Author:      Sychev Pavel, Volosatov Nikolay
-#
-# Created:     22.01.2017
-# Copyright:   (c) Sychev Pavel 2012
-# Licence:     GPL
-# ----------------------------------------------------------
+# Author:       Sychev Pavel, Volosatov Nikolay
+# Created:      22.01.2017
+# Copyright:    (c) Sychev Pavel 2017
+# Licence:      GPL
 
 import base
 from time import gmtime, strftime

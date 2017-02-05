@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# -----------------------------------------
-# Name:        TelegramNotification plugin
-# Purpose:
-#
-# Author:      Nikolay Volosatov
-#
-# Created:     27.10.2016
-# Copyright:   (c) Nikolay Volosatov 2016
-# Licence:     GPL
-# -----------------------------------------
+# Author:       Nikolay Volosatov
+# Created:      27.10.2016
+# Copyright:    (c) Sychev Pavel 2017
+# Licence:      GPL
 
 import base
 

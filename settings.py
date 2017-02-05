@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+
+# Author:       Nikolay Volosatov
+# Created:      05.02.2017
+# Copyright:    (c) Sychev Pavel 2017
+# Licence:      GPL
+
 import json
 
 

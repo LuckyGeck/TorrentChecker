@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# ----------------------------------------------------------
-# Name:        Plugin for HTTP proxy
-# Purpose:     Configure proxy for HTTP requests
-#
-# Author:      Sychev Pavel, Volosatov Nikolay
-#
-# Created:     22.01.2017
-# Copyright:   (c) Sychev Pavel 2012
-# Licence:     GPL
-# ----------------------------------------------------------
+# Author:       Sychev Pavel, Nikolay Volosatov
+# Created:      22.01.2017
+# Copyright:    (c) Sychev Pavel 2017
+# Licence:      GPL
 
 import base
 
