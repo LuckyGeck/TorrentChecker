@@ -36,8 +36,10 @@ class BasePlugin:
 class ServerPlugin(BasePlugin):
     login = ''
     password = ''
-    opener = None
     filename_template = '{torrent_id}.torrent'
+
+    opener = None
+    cookies = None
 
     def __init__(self, settings):
         BasePlugin.__init__(self, settings)
@@ -53,34 +55,38 @@ class ServerPlugin(BasePlugin):
         pass
 
     def is_authorized(self, opener):
-
         return False
 
     def authorize(self, opener):
         pass
 
-    def get_topic_url(self, torrent_id):
-        pass
+    def ensure_cookies_initialization(self):
+        if not self.cookies:
+            cookies = cookielib.LWPCookieJar(self.cookies_file)
+            try:
+                cookies.load()
+            except Exception as e:
+                pass
+            self.cookies = cookies
 
-    def init_opener(self):
-        cookies = cookielib.LWPCookieJar(self.cookies_file)
-        try:
-            cookies.load()
-        except Exception as e:
-            pass
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
-        if not self.is_authorized(opener):
-            self.log_debug('Auth...')
-            self.authorize(opener)
-            if not self.is_authorized(opener):
-                raise Exception('Not authorized')
-            self.log_debug('Auth - ok!')
-            cookies.save()
-        return opener
+    def ensure_opener_initialization(self):
+        if not self.opener:
+            cookies_processor = urllib2.HTTPCookieProcessor(self.cookies)
+            self.opener = urllib2.build_opener(cookies_processor)
 
     def ensure_authorization(self):
-        if not self.opener:
-            self.opener = self.init_opener()
+        self.ensure_cookies_initialization()
+        self.ensure_opener_initialization()
+        if not self.is_authorized(self.opener):
+            self.log_debug('Auth...')
+            self.authorize(self.opener)
+            if not self.is_authorized(self.opener):
+                raise Exception('Not authorized')
+            self.log_debug('Auth - ok!')
+            self.cookies.save()
+
+    def get_topic_url(self, torrent_id):
+        pass
 
     def load_description(self, torrent_id):
         pass

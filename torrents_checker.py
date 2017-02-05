@@ -9,6 +9,7 @@
 from plugins import plugins
 from codecs import open
 import json
+import hashlib
 from settings import settings
 
 
@@ -29,18 +30,24 @@ def save_torrents_list(torrents_list, path, encoding):
         torrents_file.write(json_string)
 
 
+def data_hash(data):
+    md5 = hashlib.md5()
+    md5.update(data)
+    return md5.hexdigest()
+
+
 def process_torrent(torrent, save_as_tamplate):
     new_torrent = torrent.copy()
     if torrent["tracker"] not in plugins.servers:
         print "No such server handler: {}".format(torrent["tracker"])
     else:
         plugin = plugins.servers[torrent["tracker"]]
-        plugin.ensure_authorization()
 
         torrent_id = torrent["id"]
         description = torrent.get("description")
         old_md5 = torrent.get("hash", "")
-        (new_md5, data) = plugin.load_torrent(torrent_id)
+        data = plugin.load_torrent(torrent_id)
+        new_md5 = data_hash(data)
 
         if new_md5 != old_md5:
             print "Updated [{}] {}".format(torrent_id, description)

@@ -6,15 +6,11 @@
 # Licence:      GPL
 
 import base
-import urllib2
 import urllib
-import cookielib
-import hashlib
 import re
 
 
 class RuTracker(base.ServerPlugin):
-    post_params = ''
     tracker_host = 'rutracker.org'
     re_title = re.compile(r"<h1 class=[^>]*>\s*<a[^>]+>\s*(?P<name>.*)</a")
     re_tags = re.compile(r"<[^>].*?>")
@@ -46,7 +42,7 @@ class RuTracker(base.ServerPlugin):
 
     def load_description(self, torrent_id):
         url = self.get_topic_url(torrent_id)
-        data = self.opener.open(url, self.post_params).read()
+        data = self.opener.open(url).read()
         title = re.search(self.re_title, data).group("name")
         title = re.sub(self.re_tags, "", title)
         title = re.sub(self.re_quot, '"', title)
@@ -57,13 +53,12 @@ class RuTracker(base.ServerPlugin):
             self.tracker_host, torrent_id)
 
     def load_torrent(self, torrent_id):
+        self.ensure_authorization()
         self.log_debug('Loading torrent {}'.format(torrent_id))
         url = 'http://{}/forum/dl.php?t={}'.format(
             self.tracker_host, torrent_id)
-        data = self.opener.open(url, self.post_params).read()
-        md5 = hashlib.md5()
-        md5.update(data)
-        return md5.hexdigest(), data
+        data = self.opener.open(url).read()
+        return data
 
 
 if __name__ == '__main__':

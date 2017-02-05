@@ -6,15 +6,11 @@
 # Licence:      GPL
 
 import base
-import urllib2
 import urllib
-import cookielib
-import hashlib
 import re
 
 
 class NNMClub(base.ServerPlugin):
-    post_params = ''
     tracker_host = 'nnmclub.to'
 
     @staticmethod
@@ -45,7 +41,7 @@ class NNMClub(base.ServerPlugin):
 
     def load_description(self, torrent_id):
         url = self.get_topic_url(torrent_id)
-        data = self.opener.open(url, self.post_params).read()
+        data = self.opener.open(url).read()
         title_tag = re.search(r"<h1 style=.*", data).group()
         title = re.split(r"<[^>]*>", title_tag)[2]
         return title.decode("cp1251")
@@ -55,16 +51,15 @@ class NNMClub(base.ServerPlugin):
             self.tracker_host, torrent_id)
 
     def load_torrent(self, torrent_id):
+        self.ensure_authorization()
         self.log_debug('Loading torrent {}'.format(torrent_id))
         topic_url = self.get_topic_url(torrent_id)
-        data = self.opener.open(topic_url, self.post_params).read()
+        data = self.opener.open(topic_url).read()
         download_url = re.search(r'download\.php\?id=[^"]*', data).group()
 
         url = 'http://{}/forum/{}'.format(self.tracker_host, download_url)
-        data = self.opener.open(url, self.post_params).read()
-        md5 = hashlib.md5()
-        md5.update(data)
-        return md5.hexdigest(), data
+        data = self.opener.open(url).read()
+        return data
 
 
 if __name__ == '__main__':
