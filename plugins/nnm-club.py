@@ -23,7 +23,8 @@ class NNMClub(base.ServerPlugin):
     post_params = ''
     tracker_host = 'nnmclub.to'
 
-    def get_plugin_name(self):
+    @staticmethod
+    def get_plugin_name():
         return 'nnm-club'
 
     def get_server_name(self):

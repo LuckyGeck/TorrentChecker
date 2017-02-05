@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 # ----------------------------------------------------------
-# Name:        NNM-Club Grabber plugin
-# Purpose:     Get new episodes of serials from NNM-Club.RU
+# Name:        Plugin for HTTP proxy
+# Purpose:     Configure proxy for HTTP requests
 #
 # Author:      Sychev Pavel, Volosatov Nikolay
 #
-# Created:     18.03.2012
+# Created:     22.01.2017
 # Copyright:   (c) Sychev Pavel 2012
 # Licence:     GPL
 # ----------------------------------------------------------
@@ -18,11 +18,12 @@ class Proxy(base.OnStartPlugin):
 
     def __init__(self, settings):
         base.OnStartPlugin.__init__(self, settings)
-        self.url = settings[self.key('url')]
-        self.login = settings[self.key('login')]
-        self.password = settings[self.key('password')]
+        self.url = settings['url']
+        self.login = settings['login']
+        self.password = settings['password']
 
-    def get_plugin_name(self):
+    @staticmethod
+    def get_plugin_name():
         return 'proxy'
 
     def on_start_process(self):

@@ -26,7 +26,8 @@ class RuTracker(base.ServerPlugin):
     re_tags = re.compile(r"<[^>].*?>")
     re_quot = re.compile(r"&quot;")
 
-    def get_plugin_name(self):
+    @staticmethod
+    def get_plugin_name():
         return 'rutracker'
 
     def get_server_name(self):

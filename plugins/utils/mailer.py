@@ -33,7 +33,7 @@ def build_table(contents):
 
 
 def send_email(smtp_host, is_ssl, is_tls,
-               from_addr, password, to_addr, html_text, mail_text):
+               login, password, from_addr, to_addr, html_text, mail_text):
     import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
@@ -58,7 +58,7 @@ def send_email(smtp_host, is_ssl, is_tls,
         server.ehlo()
         server.starttls()
         server.ehlo()
-    server.login(from_addr, password)
+    server.login(login, password)
     server.sendmail(from_addr, to_addr, multi_msg.as_string())
     server.quit()
     print 'Message sent!'

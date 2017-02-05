@@ -24,10 +24,12 @@ class Logger(base.OnNewTorrentPlugin, base.OnFinishPlugin):
     def __init__(self, settings):
         base.OnNewTorrentPlugin.__init__(self, settings)
         base.OnFinishPlugin.__init__(self, settings)
-        self.log_path = settings[self.key('saveas')]
-        self.use_json = settings[self.key('json_instead_of_text')]
+        self.log_path = settings['save_as']
+        self.use_json = settings['use_json']
+        self.log_list = []
 
-    def get_plugin_name(self):
+    @staticmethod
+    def get_plugin_name():
         return 'logger'
 
     def on_new_torrent_process(self, torrent_id, description, plugin_obj):
@@ -49,25 +51,26 @@ class Logger(base.OnNewTorrentPlugin, base.OnFinishPlugin):
             self.log_list.append(log_line)
 
     def on_finish_process(self):
-        if self.log_list:
-            if self.use_json:
-                from json import dumps, loads
-                old_log_content = []
-                try:
-                    old_log_content = loads(
-                        codecs.open(self.log_path, 'r', 'utf-8').read())
-                except:
-                    pass
-                new_log_list = old_log_content + self.log_list
-                log_text = dumps(new_log_list, indent=2, encoding='cp1251',
-                                 ensure_ascii=False)
-                f = codecs.open(self.log_path, 'w', 'utf-8')
-                f.write(log_text)
-                f.close()
-            else:
-                f = codecs.open(self.log_path, 'a', 'utf-8')
-                f.writelines(self.log_list)
-                f.close()
+        if len(self.log_list) == 0:
+            return
+        if self.use_json:
+            from json import dumps, loads
+            old_log_content = []
+            try:
+                old_log_content = loads(
+                    codecs.open(self.log_path, 'r', 'utf-8').read())
+            except:
+                pass
+            new_log_list = old_log_content + self.log_list
+            log_text = dumps(new_log_list, indent=2, encoding='cp1251',
+                             ensure_ascii=False)
+            f = codecs.open(self.log_path, 'w', 'utf-8')
+            f.write(log_text)
+            f.close()
+        else:
+            f = codecs.open(self.log_path, 'a', 'utf-8')
+            f.writelines(self.log_list)
+            f.close()
 
 if __name__ == '__main__':
     print "Logging plugin"

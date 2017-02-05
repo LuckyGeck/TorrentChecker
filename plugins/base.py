@@ -3,13 +3,11 @@
 
 class BasePlugin:
     active = False
+    debug = False
 
     def __init__(self, settings):
-        self.active = settings.get(self.key('active'), '0') == '1'
-        self.debug = settings.get(self.key('debug'), '0') == '1'
-
-    def key(self, key_name):
-        return "{}.{}".format(self.get_plugin_name(), key_name)
+        self.active = settings.get('active', False)
+        self.debug = settings.get('debug', False)
 
     def log_message(self, message):
         print "[{} plugin] {}".format(self.get_plugin_name(), message)
@@ -22,7 +20,8 @@ class BasePlugin:
         print "[{} plugin] {}\n*** {} ***".format(
             self.get_plugin_name(), message, error)
 
-    def get_plugin_name(self):
+    @staticmethod
+    def get_plugin_name():
         return ''
 
 
@@ -30,13 +29,13 @@ class ServerPlugin(BasePlugin):
     login = ''
     password = ''
     opener = None
-    filename_template = '%s.torrent'
+    filename_template = '{torrent_id}.torrent'
 
     def __init__(self, settings):
         BasePlugin.__init__(self, settings)
-        self.login = settings.get(self.key('login'))
-        self.password = settings.get(self.key('password'))
-        self.filename_template = settings.get(self.key('saveas'))
+        auth_settings = settings.get('auth', dict())
+        self.login = auth_settings.get('login')
+        self.password = auth_settings.get('password')
 
     def get_server_name(self):
         pass

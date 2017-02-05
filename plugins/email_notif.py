@@ -29,21 +29,26 @@ class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
 
     # Credentials
     smtp_host = ''
+    login = ''
+    password = ''
     from_mail = ''
-    from_password = ''
     to_mail = ''
 
     def __init__(self, settings):
         base.OnNewTorrentPlugin.__init__(self, settings)
         base.OnFinishPlugin.__init__(self, settings)
-        self.smtp_host = settings[self.key('smtp_host')]
-        self.is_ssl = settings[self.key('ssl')] == '1'
-        self.is_tls = settings[self.key('tls')] == '1'
-        self.from_mail = settings[self.key('fromMail')]
-        self.from_password = settings[self.key('fromPassword')]
-        self.to_mail = settings[self.key('toMail')]
+        smtp_settings = settings['smtp']
+        self.smtp_host = smtp_settings['host']
+        self.is_ssl = smtp_settings['ssl']
+        self.is_tls = smtp_settings['tls']
+        self.login = smtp_settings['login']
+        self.password = smtp_settings['password']
 
-    def get_plugin_name(self):
+        self.from_mail = settings['from_mail']
+        self.to_mail = settings['to_mail']
+
+    @staticmethod
+    def get_plugin_name():
         return 'mailer'
 
     def on_new_torrent_process(self, torrent_id, description, plugin_obj):
@@ -62,7 +67,7 @@ class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
         from plugins.utils import mailer
         full_body = mailer.build_table(self.mail_body)
         mailer.send_email(self.smtp_host, self.is_ssl, self.is_tls,
-                          self.from_mail, self.from_password,
+                          self.login, self.password, self.from_mail,
                           self.to_mail, full_body, self.simple_body)
         self.log_debug('Email sent')
 

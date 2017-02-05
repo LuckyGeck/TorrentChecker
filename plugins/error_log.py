@@ -38,9 +38,10 @@ class ErrorLog(base.OnStartPlugin):
 
     def __init__(self, settings):
         base.OnStartPlugin.__init__(self, settings)
-        self.save_as = settings[self.key('saveas')]
+        self.save_as = settings['save_as']
 
-    def get_plugin_name(self):
+    @staticmethod
+    def get_plugin_name():
         return 'error_log'
 
     def on_start_process(self):

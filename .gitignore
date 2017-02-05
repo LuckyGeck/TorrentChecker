@@ -2,7 +2,7 @@
 ## Project related ##
 
 # Settings
-settings.py
+settings.json
 torrents.json
 
 # Torrent files

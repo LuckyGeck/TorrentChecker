@@ -15,19 +15,20 @@ import base
 
 
 class TelegramNotify(base.OnNewTorrentPlugin):
-    msg = ''
+    message_template = ''
     token = ''
     username = ''
     chat_id = 0
 
     def __init__(self, settings):
         base.OnNewTorrentPlugin.__init__(self, settings)
-        self.msg = settings[self.key('msg')]
-        self.token = settings[self.key('token')]
-        self.username = settings[self.key('username')]
-        self.chat_id = settings[self.key('chat_id')]
+        self.message_template = settings['message_template']
+        self.token = settings['token']
+        self.username = settings['username']
+        self.chat_id = settings['chat_id']
 
-    def get_plugin_name(self):
+    @staticmethod
+    def get_plugin_name():
         return 'telegram'
 
     def on_new_torrent_process(self, torrent_id, description, plugin_obj):
@@ -36,7 +37,7 @@ class TelegramNotify(base.OnNewTorrentPlugin):
                 import telegram
                 bot = telegram.Bot(token=self.token)
                 url = plugin_obj.get_topic_url(torrent_id)
-                msg = self.msg % (description, url)
+                msg = self.message_template % (description, url)
                 bot.sendMessage(chat_id=self.chat_id, text=msg)
             except Exception as e:
                 self.log_error("Some error in message sending.", e)

@@ -15,23 +15,20 @@ import base
 
 
 class TwitterNotify(base.OnNewTorrentPlugin):
-    msg = ''
+    message_template = ''
 
     def __init__(self, settings):
         base.OnNewTorrentPlugin.__init__(self, settings)
-        try:
-            self.msg = settings[self.key('msg')]
-        except Exception as e:
-            self.log_error("Wrong settings file.", e)
-            self.active = False
+        self.message_template = settings['message_template']
 
-    def get_plugin_name(self):
+    @staticmethod
+    def get_plugin_name():
         return 'twitter'
 
     def on_new_torrent_process(self, torrent_id, description, plugin_obj):
         try:
             import os
-            message = self.msg % description
+            message = self.message_template % description
             os.system('ttytter -status="{}"'.format(message))
         except Exception as e:
             self.log_error("Some error in twit sending.", e)

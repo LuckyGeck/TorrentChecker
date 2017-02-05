@@ -62,10 +62,12 @@ class PluginsContainer:
         for module_obj in modules:
             for elem in dir(module_obj):
                 try:
-                    obj = getattr(module_obj, elem)
-                    if inspect.isclass(obj) and \
-                            issubclass(obj, self.base.BasePlugin):
-                        obj = obj(settings)
+                    cls = getattr(module_obj, elem)
+                    if inspect.isclass(cls) and \
+                            issubclass(cls, self.base.BasePlugin):
+                        plugin_name = cls.get_plugin_name()
+                        plugin_settings = settings.get(plugin_name, dict())
+                        obj = cls(plugin_settings)
                         self._add(obj)
                 except Exception as e:
                     msg = "***Error while loading plugin [{}.{}]***\n{}"
