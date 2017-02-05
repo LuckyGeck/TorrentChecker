@@ -8,6 +8,9 @@ torrents.json
 # Torrent files
 *.torrent
 
+# Cookies
+*.cookies.txt
+
 # IDE
 .idea
 

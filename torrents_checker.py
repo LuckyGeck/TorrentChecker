@@ -35,7 +35,7 @@ def process_torrent(torrent, save_as_tamplate):
         print "No such server handler: {}".format(torrent["tracker"])
     else:
         plugin = plugins.servers[torrent["tracker"]]
-        plugin.authorize()
+        plugin.ensure_authorization()
 
         torrent_id = torrent["id"]
         description = torrent.get("description")

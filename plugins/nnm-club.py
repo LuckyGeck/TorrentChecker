@@ -33,14 +33,15 @@ class NNMClub(base.ServerPlugin):
             'login': '%C2%F5%EE%E4'
         })
 
-    def get_auth(self):
-        self.log_debug('Auth...')
+    def is_authorized(self, opener):
+        template = 'http://{}/forum/watched_topics.php'
+        url = template.format(self.tracker_host)
+        response = opener.open(url)
+        return response.geturl() == url
+
+    def authorize(self, opener):
         login_page = 'http://{}/forum/login.php'.format(self.tracker_host)
-        cookies = cookielib.MozillaCookieJar('./cookies.txt')
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
         opener.open(login_page, self.get_auth_params()).read()
-        self.log_debug('Auth - ok!')
-        return opener
 
     def load_description(self, torrent_id):
         url = self.get_topic_url(torrent_id)

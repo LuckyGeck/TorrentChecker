@@ -16,7 +16,7 @@ import re
 class RuTracker(base.ServerPlugin):
     post_params = ''
     tracker_host = 'rutracker.org'
-    re_title = re.compile(r"<h1 class=[^>]*><a href[^>]*>(?P<name>.*)</a")
+    re_title = re.compile(r"<h1 class=[^>]*>\s*<a[^>]+>\s*(?P<name>.*)</a")
     re_tags = re.compile(r"<[^>].*?>")
     re_quot = re.compile(r"&quot;")
 
@@ -31,17 +31,18 @@ class RuTracker(base.ServerPlugin):
         return urllib.urlencode({
             'login_username': self.login,
             'login_password': self.password,
-            'login': '%C2%F5%EE%E4'
+            'login': '%E2%F5%EE%E4'
         })
 
-    def get_auth(self):
-        self.log_debug('Auth...')
-        login_url = 'http://login.{}/forum/login.php'.format(self.tracker_host)
-        cookies = cookielib.MozillaCookieJar('./cookies.txt')
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
+    def is_authorized(self, opener):
+        template = 'http://{}/forum/privmsg.php?folder=inbox'
+        url = template.format(self.tracker_host)
+        response = opener.open(url)
+        return response.geturl() == url
+
+    def authorize(self, opener):
+        login_url = 'http://{}/forum/login.php'.format(self.tracker_host)
         opener.open(login_url, self.get_auth_params()).read()
-        self.log_debug('Auth - ok!')
-        return opener
 
     def load_description(self, torrent_id):
         url = self.get_topic_url(torrent_id)
@@ -57,7 +58,7 @@ class RuTracker(base.ServerPlugin):
 
     def load_torrent(self, torrent_id):
         self.log_debug('Loading torrent {}'.format(torrent_id))
-        url = 'http://dl.{}/forum/dl.php?t={}'.format(
+        url = 'http://{}/forum/dl.php?t={}'.format(
             self.tracker_host, torrent_id)
         data = self.opener.open(url, self.post_params).read()
         md5 = hashlib.md5()

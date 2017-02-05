@@ -5,6 +5,9 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
+import urllib2
+import cookielib
+
 
 class BasePlugin:
     active = False
@@ -42,18 +45,42 @@ class ServerPlugin(BasePlugin):
         self.login = auth_settings.get('login')
         self.password = auth_settings.get('password')
 
+        plugin_name = self.__class__.get_plugin_name()
+        default_cookies_file = './{}.cookies.txt'.format(plugin_name)
+        self.cookies_file = settings.get('cookies_file', default_cookies_file)
+
     def get_server_name(self):
         pass
 
-    def get_auth(self):
-        return None
+    def is_authorized(self, opener):
+
+        return False
+
+    def authorize(self, opener):
+        pass
 
     def get_topic_url(self, torrent_id):
         pass
 
-    def authorize(self):
+    def init_opener(self):
+        cookies = cookielib.LWPCookieJar(self.cookies_file)
+        try:
+            cookies.load()
+        except Exception as e:
+            pass
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies))
+        if not self.is_authorized(opener):
+            self.log_debug('Auth...')
+            self.authorize(opener)
+            if not self.is_authorized(opener):
+                raise Exception('Not authorized')
+            self.log_debug('Auth - ok!')
+            cookies.save()
+        return opener
+
+    def ensure_authorization(self):
         if not self.opener:
-            self.opener = self.get_auth()
+            self.opener = self.init_opener()
 
     def load_description(self, torrent_id):
         pass
@@ -63,18 +90,15 @@ class ServerPlugin(BasePlugin):
 
 
 class OnStartPlugin(BasePlugin):
-
     def on_start_process(self):
         raise NotImplementedError
 
 
 class OnNewTorrentPlugin(BasePlugin):
-
     def on_new_torrent_process(self, torrent_id, description, plugin_obj):
         raise NotImplementedError
 
 
 class OnFinishPlugin(BasePlugin):
-
     def on_finish_process(self):
         raise NotImplementedError
