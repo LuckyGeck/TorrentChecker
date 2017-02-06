@@ -3,7 +3,7 @@
 
 # Settings
 settings.json
-torrents.json
+shows.json
 
 # Torrent files
 *.torrent

@@ -2,9 +2,9 @@ Torrent Checker system
 ======================
 
 ## Перед первым запуском
-- Создайте файлы со своими настройками и списками торрентов: [`settings.json`](#settings), [`torrents.json`](#torrentList).
+- Создайте файлы со своими настройками и списком сериалов: [`settings.json`](#settings), [`shows.json`](#torrentList).
 
-Примеры файлов - `settings.json.sample`, `torrents.json.sample` лежат в папке `default`.
+Примеры файлов - `settings.json.sample`, `shows.json.sample` лежат в папке `default`.
 
 ## ФАЙЛ НАСТРОЕК
 
@@ -25,10 +25,10 @@ Torrent Checker system
     * логины и пароли для нужных вам торрент трекеров
 - Сохраните файл
 
-## ФАЙЛ СО СПИСКОМ ТОРРЕНТОВ
+## ФАЙЛ СО СПИСКОМ СЕРИАЛОВ
 
 ### Имя
-- `torrents.json`
+- `shows.json`
 
 ### Расположение
 - В корне папки torrentChecker
@@ -79,7 +79,7 @@ Torrent Checker system
         + В файле строка будет выглядеть так: `"descr" : "ТБВ 6 сезон"`
 
 ### Установка
-Пример файла находится тут: `default/torrents.json.sample`
+Пример файла находится тут: `default/shows.json.sample`
 - Скопируйте в корневую папку файл (заменив имя файла на нужное)
 - Откройте файл текстовым редактором
 - Добавьте в него список торрентов, за которыми хотите следить

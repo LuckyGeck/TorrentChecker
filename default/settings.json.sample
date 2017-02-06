@@ -2,7 +2,7 @@
     "shows": {
         "save_as": "./[{plugin_name}].t{torrent_id}.torrent",
         "list": {
-            "path": "./torrents.json",
+            "path": "./shows.json",
             "enc": "cp1251"
         }
     },
