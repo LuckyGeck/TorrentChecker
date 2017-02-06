@@ -7,6 +7,7 @@
 
 import urllib2
 import cookielib
+import sys
 
 
 class BasePlugin:
@@ -17,16 +18,20 @@ class BasePlugin:
         self.active = settings.get('active', False)
         self.debug = settings.get('debug', False)
 
-    def log_message(self, message):
-        print "[{} plugin] {}".format(self.get_plugin_name(), message)
+    def log_message(self, message, is_error=False):
+        msg = "[{} plugin] {}\n".format(self.get_plugin_name(), message)
+        if is_error:
+            sys.stderr.write(msg)
+        else:
+            sys.stdout.write(msg)
 
     def log_debug(self, message):
         if self.debug:
-            self.log_message(message)
+            self.log_message('[debug] {}'.format(message), True)
 
     def log_error(self, message, error):
-        print "[{} plugin] {}\n*** {} ***".format(
-            self.get_plugin_name(), message, error)
+        msg = "{}\n*** {} ***".format(message, error)
+        self.log_message(msg, True)
 
     @staticmethod
     def get_plugin_name():

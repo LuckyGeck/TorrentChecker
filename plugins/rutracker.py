@@ -34,7 +34,9 @@ class RuTracker(base.ServerPlugin):
         template = 'http://{}/forum/privmsg.php?folder=inbox'
         url = template.format(self.tracker_host)
         response = opener.open(url)
-        return response.geturl() == url
+        response_url = response.geturl()
+        self.log_debug('Auth is {} == {}'.format(response_url, url))
+        return response_url == url
 
     def authorize(self, opener):
         login_url = 'http://{}/forum/login.php'.format(self.tracker_host)
@@ -49,7 +51,7 @@ class RuTracker(base.ServerPlugin):
         return title.decode("cp1251")
 
     def get_topic_url(self, torrent_id):
-        return u'http://{}/forum/viewtopic.php?t={}'.format(
+        return 'http://{}/forum/viewtopic.php?t={}'.format(
             self.tracker_host, torrent_id)
 
     def load_torrent(self, torrent_id):
@@ -58,6 +60,7 @@ class RuTracker(base.ServerPlugin):
         url = 'http://{}/forum/dl.php?t={}'.format(
             self.tracker_host, torrent_id)
         data = self.opener.open(url).read()
+        self.log_debug('Torrent {} size: {}'.format(torrent_id, len(data)))
         return data
 
 

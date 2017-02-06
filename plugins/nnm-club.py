@@ -33,7 +33,9 @@ class NNMClub(base.ServerPlugin):
         template = 'http://{}/forum/watched_topics.php'
         url = template.format(self.tracker_host)
         response = opener.open(url)
-        return response.geturl() == url
+        response_url = response.geturl()
+        self.log_debug('Auth is {} == {}'.format(response_url, url))
+        return response_url == url
 
     def authorize(self, opener):
         login_page = 'http://{}/forum/login.php'.format(self.tracker_host)
@@ -52,13 +54,14 @@ class NNMClub(base.ServerPlugin):
 
     def load_torrent(self, torrent_id):
         self.ensure_authorization()
-        self.log_debug('Loading torrent {}'.format(torrent_id))
+        self.log_debug('Fetching download URL for {}'.format(torrent_id))
         topic_url = self.get_topic_url(torrent_id)
         data = self.opener.open(topic_url).read()
         download_url = re.search(r'download\.php\?id=[^"]*', data).group()
-
+        self.log_debug('Loading torrent {}'.format(torrent_id))
         url = 'http://{}/forum/{}'.format(self.tracker_host, download_url)
         data = self.opener.open(url).read()
+        self.log_debug('Torrent {} size: {}'.format(torrent_id, len(data)))
         return data
 
 
