@@ -16,6 +16,42 @@ class RuTracker(base.ServerPlugin):
     re_tags = re.compile(r"<[^>].*?>")
     re_quot = re.compile(r"&quot;")
 
+    search_item_re = re.compile(r'<tr\s+class="tCenter'
+                                r'.+?f=\d+">(?P<group>.+?)<\/a>'
+                                r'.+?viewtopic.php\?t=(?P<id>\d+)'
+                                r'[^>]+>(?P<name>.+?)<\/a>'
+                                r'.+?tor-size.+?<u>(?P<size>\d+)<\/u>'
+                                r'.+?seedmed[^>]+>(?P<seeders>\d+)<\/b>'
+                                r'.+?<\/tr>')
+    filter_types = {
+        'new-movie': [2200],
+        'screen-movie': [2200],
+        '3d-movie': [352, 549, 1213, 2109, 514, 2097],
+        'movie': [7, 187, 2090, 2221, 2091, 2092, 2093, 2200, 2540, 934, 505,
+                  212, 2459, 1235, 185, 22, 941, 1666, 376, 124, 1543, 709,
+                  1577, 511, 656, 93, 905, 1576, 101, 100, 572, 2220, 1670,
+                  2198, 2199, 313, 2201, 312, 2339, 4, 2343, 930, 2365, 1900,
+                  521, 2258, 208, 539, 209, 484, 822, 921, 922, 1247, 923, 924,
+                  1991, 925, 1165, 1245, 928, 926, 1246, 1250, 927, 1248, 33,
+                  281, 1386, 1387, 1388, 282, 599, 1105, 1389, 1391, 2491, 404,
+                  1390, 1642, 893, 1478],
+        'show': [9, 104, 1408, 1535, 91, 1356, 990, 856, 188, 310, 202, 935,
+                 172, 805, 80, 119, 812, 175, 79, 123, 189, 842, 235, 242, 819,
+                 1531, 721, 1102, 1120, 1214, 387, 1359, 271, 273, 743, 184,
+                 194, 85, 1171, 1417, 1144, 595, 1288, 1605, 1694, 1690, 820,
+                 625, 84, 623, 1798, 106, 166, 236, 1449, 507, 504, 536, 173,
+                 918, 920, 203, 1243, 140, 636, 606, 776, 181, 1499, 81, 266,
+                 252, 196, 372, 110, 193, 237, 265, 1117, 497, 121, 134, 195,
+                 2366, 2401, 2390, 1669, 2391, 2392, 2407, 2393, 2370, 2394,
+                 2408, 2395, 2396, 2397, 2398, 2399, 2400, 2402, 2403, 2404,
+                 2405, 2406, 911, 1493, 1301, 704, 1940, 1574, 1539, 1500, 823,
+                 1006, 877, 972, 781, 1300, 1803, 1298, 825, 1606, 1458, 1463,
+                 1459, 1461, 718, 1498, 907, 992, 607, 594, 775, 534, 1462,
+                 1678, 904, 1460, 816, 815, 325, 1457, 1692, 1540, 694, 1949,
+                 1541, 1941, 1537, 2100, 717, 915, 1242, 2412, 1938, 2104,
+                 1939, 2102, 2103],
+    }
+
     @staticmethod
     def get_plugin_name():
         return 'rutracker'
@@ -62,6 +98,33 @@ class RuTracker(base.ServerPlugin):
         data = self.opener.open(url).read()
         self.log_debug('Torrent {} size: {}'.format(torrent_id, len(data)))
         return data
+
+    def search_url(self, query, types):
+        url_query = urllib.urlencode({
+            'nm': query,
+            'o': 10,
+            's': 2,
+            'f': ','.join(str(t) for t in types)
+        })
+        # Ordering is not working for wildcard queries at RuTracker :(
+        url_template = 'http://{}/forum/tracker.php?{}'
+        return url_template.format(self.tracker_host, url_query)
+
+    def find_torrents(self, query, type="movie"):
+        filter_types = self.filter_types.get(type)
+        if not filter_types:
+            return []
+        self.ensure_authorization()
+        url = self.search_url(query, filter_types)
+        self.log_debug('Search URL: {}'.format(url))
+        page_data = self.opener.open(url).read()
+        page = page_data.decode('windows-1251', 'ignore').encode('utf8')
+        page = str(page).replace('\n', '')
+        torrents = []
+        for match in self.search_item_re.finditer(page):
+            torrent = match.groupdict()
+            torrents.append(torrent)
+        return torrents
 
 
 if __name__ == '__main__':

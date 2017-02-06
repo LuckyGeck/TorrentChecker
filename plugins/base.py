@@ -99,6 +99,9 @@ class ServerPlugin(BasePlugin):
     def load_torrent(self, torrent_id):
         pass
 
+    def find_torrents(self, query, type="movie"):
+        pass
+
 
 class OnStartPlugin(BasePlugin):
     def on_start_process(self):
