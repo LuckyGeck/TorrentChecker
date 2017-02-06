@@ -8,6 +8,13 @@
 import base
 
 
+def rnd_str(str_len=6):
+    import random
+    import string
+    digits = string.ascii_uppercase + string.digits
+    return ''.join(random.choice(digits) for _ in range(str_len))
+
+
 class TelegramNotify(base.OnNewTorrentPlugin):
     message_template = ''
     token = ''
@@ -26,15 +33,16 @@ class TelegramNotify(base.OnNewTorrentPlugin):
         return 'telegram'
 
     def on_new_torrent_process(self, torrent_id, description, plugin_obj):
-        if self.active:
-            try:
-                import telegram
-                bot = telegram.Bot(token=self.token)
-                url = plugin_obj.get_topic_url(torrent_id)
-                msg = self.message_template % (description, url)
-                bot.sendMessage(chat_id=self.chat_id, text=msg)
-            except Exception as e:
-                self.log_error("Some error in message sending.", e)
+        import telegram
+        bot = telegram.Bot(token=self.token)
+        url = plugin_obj.get_topic_url(torrent_id)
+        randomized_url = '{}&rnd={}'.format(url, rnd_str())
+        msg_args = {
+            "description": description,
+            "url": randomized_url,
+        }
+        msg = self.message_template.format(**msg_args)
+        bot.sendMessage(chat_id=self.chat_id, text=msg)
 
 
 def start_bot(token, username):

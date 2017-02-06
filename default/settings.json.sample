@@ -38,12 +38,12 @@
         },
         "twitter": {
             "active": false,
-            "message_template": "@username, there is a new episode of %s"
+            "message_template": "@username, there is a new episode of {description}"
         },
         "telegram": {
             "active": false,
             "token": "00000000:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "message_template": "There is a new episode of %s.\n%s",
+            "message_template": "There is a new episode of {description}.\n{url}",
             "username": "username",
             "chat_id": "0000000"
         },
