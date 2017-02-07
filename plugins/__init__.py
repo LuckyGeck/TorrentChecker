@@ -37,7 +37,6 @@ class PluginsContainer:
     def _add(self, obj):
         if not obj.active:
             return
-        # server plugin
         if issubclass(obj.__class__, self.base.ServerPlugin):
             server_name = obj.get_server_name()
             if not isinstance(server_name, type(())):
@@ -45,13 +44,10 @@ class PluginsContainer:
             for name in server_name:
                 self.servers[name] = obj
         else:
-            # plugin after start
             if issubclass(obj.__class__, self.base.OnStartPlugin):
                 self.on_start_plugins.append(obj)
-            # plugins on new episode found
             if issubclass(obj.__class__, self.base.OnNewTorrentPlugin):
                 self.on_new_torrent_plugins.append(obj)
-            # server plugin
             if issubclass(obj.__class__, self.base.OnFinishPlugin):
                 self.on_finish_plugins.append(obj)
 

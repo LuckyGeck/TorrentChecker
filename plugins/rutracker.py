@@ -5,9 +5,10 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
-import base
-import urllib
 import re
+import urllib
+
+import base
 
 
 class RuTracker(base.ServerPlugin):
@@ -16,7 +17,7 @@ class RuTracker(base.ServerPlugin):
     re_tags = re.compile(r"<[^>].*?>")
     re_quot = re.compile(r"&quot;")
 
-    search_item_re = re.compile(r'<tr\s+class="tCenter'
+    re_search_item = re.compile(r'<tr\s+class="tCenter'
                                 r'.+?f=\d+">(?P<group>.+?)<\/a>'
                                 r'.+?viewtopic.php\?t=(?P<id>\d+)'
                                 r'[^>]+>(?P<name>.+?)<\/a>'
@@ -121,7 +122,7 @@ class RuTracker(base.ServerPlugin):
         page = page_data.decode('windows-1251', 'ignore').encode('utf8')
         page = str(page).replace('\n', '')
         torrents = []
-        for match in self.search_item_re.finditer(page):
+        for match in self.re_search_item.finditer(page):
             torrent = match.groupdict()
             torrents.append(torrent)
         return torrents

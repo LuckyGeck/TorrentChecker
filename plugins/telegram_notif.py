@@ -16,10 +16,6 @@ def rnd_str(str_len=6):
 
 
 class TelegramNotify(base.OnNewTorrentPlugin):
-    message_template = ''
-    token = ''
-    username = ''
-    chat_id = 0
 
     def __init__(self, settings):
         base.OnNewTorrentPlugin.__init__(self, settings)

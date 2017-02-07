@@ -48,7 +48,7 @@ Torrent Checker system
 
 * `tracker`
     - Тут задается имя плагина, отвечающего за сервер, на котором лежит данный торрент.
-    - На данный момент поддериваются варианты:
+    - На данный момент поддерживаются варианты:
         + `"tracker" : "rutracker"` - *для [RuTracker.ORG](http://rutracker.org)*
         + `"tracker" : "nnm-club"` - *для [NoNaMe Club](http://nnmclub.to)*
 
@@ -71,12 +71,12 @@ Torrent Checker system
         + Тогда номер раздачи: `564504`
         + В файле строка будет выглядеть так: `"id" : "564504"`
 
-* `descr`
+* `description`
     - Тут задается краткое описание, которое поможет вам понять, какой торрент вы качаете и что обновилось.
     - К примеру:
         + Для раздачи [Теория Большого Взрыва | Сезон 6](http://nnmclub.to/forum/viewtopic.php?t=564504)
         + Описание можно написать такое: `ТБВ 6 сезон`
-        + В файле строка будет выглядеть так: `"descr" : "ТБВ 6 сезон"`
+        + В файле строка будет выглядеть так: `"description" : "ТБВ 6 сезон"`
 
 ### Установка
 Пример файла находится тут: `default/shows.json.sample`
@@ -95,8 +95,8 @@ Torrent Checker system
 Для использования нотификаций в Телеграм:
 
 1. Установите [python-telegram-bot](https://github.com/python-telegram-bot).
-2. Пропишите [API ключ](https://core.telegram.org/bots#6-botfather) вашего бота и [ваш username](https://telegram.org/faq#q-what-are-usernames-how-do-i-get-one) в `settings.py`.
-3. Выполните `python plugins_dir/telegram_notif.py [token] [username]`, подставив туда данные, полученные выше.
+2. Пропишите [API ключ](https://core.telegram.org/bots#6-botfather) вашего бота и [ваш username](https://telegram.org/faq#q-what-are-usernames-how-do-i-get-one) в `settings.json`.
+3. Выполните `python plugins/telegram_notif.py [token] [username]`, подставив туда данные, полученные выше.
 4. Напишите боту в Телеграм команду `/torrents`.
 5. Впишите полученный `chat_id` в соответствующее поле в `settings.py`.
 

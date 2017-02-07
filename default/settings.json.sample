@@ -3,7 +3,7 @@
         "save_as": "./[{plugin_name}].t{torrent_id}.torrent",
         "list": {
             "path": "./shows.json",
-            "enc": "cp1251"
+            "enc": "utf8"
         }
     },
     "plugins": {

@@ -9,7 +9,6 @@ import base
 
 
 class TwitterNotify(base.OnNewTorrentPlugin):
-    message_template = ''
 
     def __init__(self, settings):
         base.OnNewTorrentPlugin.__init__(self, settings)

@@ -5,15 +5,13 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
-import base
 from time import gmtime, strftime, time
 import codecs
 
+import base
+
 
 class Logger(base.OnNewTorrentPlugin, base.OnFinishPlugin):
-    log_path = 'logger.log'
-    use_json = False  # text repr by default
-    log_list = []
 
     def __init__(self, settings):
         base.OnNewTorrentPlugin.__init__(self, settings)

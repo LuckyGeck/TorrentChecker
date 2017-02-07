@@ -5,14 +5,15 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
-import base
-import urllib
 import re
+import urllib
+
+import base
 
 
 class NNMClub(base.ServerPlugin):
     tracker_host = 'nnmclub.to'
-    search_item_re = re.compile(r'<tr\s*class="prow\d+">'
+    re_search_item = re.compile(r'<tr\s*class="prow\d+">'
                                 r'.+?<a.*?class="gen"'
                                 r'.*?>(?P<group>.*?)<\/a>'
                                 r'.+?viewtopic\.php\?t=(?P<id>\d+)'
@@ -107,7 +108,7 @@ class NNMClub(base.ServerPlugin):
         page = page_data.decode('windows-1251', 'ignore').encode('utf8')
         page = str(page).replace('\n', '')
         torrents = []
-        for match in self.search_item_re.finditer(page):
+        for match in self.re_search_item.finditer(page):
             torrent = match.groupdict()
             torrents.append(torrent)
         return torrents

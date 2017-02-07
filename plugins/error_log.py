@@ -5,8 +5,9 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
-import base
 from time import gmtime, strftime
+
+import base
 
 
 class ErrorFile:

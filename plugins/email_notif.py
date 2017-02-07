@@ -9,24 +9,12 @@ import base
 
 
 class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
-    # Current mail bodies
-    mail_body = ''
-    simple_body = ''
-
-    # Templates
     message_template = u'Updated [{torrent_id}] {description}'
     table_template = u'''<tr>
     <td>Updated <b>{torrent_id}</b></td>
     <td>{description}</td>
     <td><a href="{url}">{full_description}</td>
     </tr>'''
-
-    # Credentials
-    smtp_host = ''
-    login = ''
-    password = ''
-    from_mail = ''
-    to_mail = ''
 
     def __init__(self, settings):
         base.OnNewTorrentPlugin.__init__(self, settings)
@@ -40,6 +28,9 @@ class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
 
         self.from_mail = settings['from_mail']
         self.to_mail = settings['to_mail']
+
+        self.mail_body = ''
+        self.simple_body = ''
 
     @staticmethod
     def get_plugin_name():
