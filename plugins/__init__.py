@@ -5,6 +5,8 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
+import base
+
 
 def _load_modules():
     import os
@@ -28,70 +30,92 @@ def _load_modules():
 
 class PluginsContainer:
     def __init__(self):
-        self.base = None
-        self.servers = dict()
-        self.on_start_plugins = []
-        self.on_new_torrent_plugins = []
-        self.on_finish_plugins = []
-
-    def _add(self, obj):
-        if not obj.active:
-            return
-        if issubclass(obj.__class__, self.base.ServerPlugin):
-            server_name = obj.get_server_name()
-            if not isinstance(server_name, type(())):
-                server_name = [server_name]
-            for name in server_name:
-                self.servers[name] = obj
-        else:
-            if issubclass(obj.__class__, self.base.OnStartPlugin):
-                self.on_start_plugins.append(obj)
-            if issubclass(obj.__class__, self.base.OnNewTorrentPlugin):
-                self.on_new_torrent_plugins.append(obj)
-            if issubclass(obj.__class__, self.base.OnFinishPlugin):
-                self.on_finish_plugins.append(obj)
+        self.__base = None
+        self.__all_plugins = dict()
 
     def load(self, settings):
         import inspect
 
-        modules, self.base = _load_modules()
-        self.servers = dict()
-        self.on_start_plugins = []
-        self.on_new_episode_plugins = []
-        self.on_finish_plugins = []
+        modules, self.__base = _load_modules()
+        self.__all_plugins = dict()
 
         for module_obj in modules:
             for elem in dir(module_obj):
                 try:
                     cls = getattr(module_obj, elem)
                     if inspect.isclass(cls) and \
-                            issubclass(cls, self.base.BasePlugin):
+                            issubclass(cls, self.__base.BasePlugin):
                         plugin_name = cls.get_plugin_name()
                         plugin_settings = settings.get(plugin_name, dict())
                         obj = cls(plugin_settings)
-                        self._add(obj)
+                        self.__all_plugins[plugin_name] = obj
                 except Exception as e:
                     msg = "***Error while loading plugin [{}.{}]***\n{}"
                     print msg.format(module_obj, elem, e)
 
+    def __plugins_of_type(self, base_class):
+        for plugin_name, plugin in self.__all_plugins.iteritems():
+            if plugin.active and issubclass(plugin.__class__, base_class):
+                yield plugin_name, plugin
+
+    def get_server(self, server_name):
+        # type: (str) -> base.ServerPlugin
+        """
+        Return server plugin with specific name
+        :param server_name: Server plugin name
+        :return: Server plugin object
+        """
+        plugin = self.__all_plugins.get(server_name)
+        is_server = issubclass(plugin.__class__, self.__base.ServerPlugin)
+        if plugin.active and is_server:
+            return plugin
+
+    def get_server_for_torrent(self, torrent):
+        # type: (base.Torrent) -> base.ServerPlugin
+        """
+        Return server plugin that can process specific torrent
+        :param torrent: Torrent object
+        :return: Server plugin object
+        """
+        server_plugins = self.__plugins_of_type(self.__base.ServerPlugin)
+        for plugin_name, plugin in server_plugins:
+            if plugin.can_process_torrent(torrent):
+                return plugin
+
     def process_on_start(self):
-        for plugin in self.on_start_plugins:
+        """
+        Process all on-start plugins. Should be called in the beginning
+        of the main process.
+        """
+        on_start_plugins = self.__plugins_of_type(self.__base.OnStartPlugin)
+        for plugin_name, plugin in on_start_plugins:
             try:
                 plugin.on_start_process()
             except BaseException as e:
-                plugin.log_error('Error while running on_load_process', e)
+                plugin.log_error('Error while running on_start_process', e)
 
-    def process_on_new_torrent(self, torrent_id, description, server_plugin):
-        for plugin in self.on_new_torrent_plugins:
+    def process_on_new_torrent(self, torrent, server_plugin):
+        # type: (base.Torrent, base.ServerPlugin) -> None
+        """
+        Process all plugins that handle new torrent loads.
+        :param torrent: Torrent object
+        :param server_plugin: Plugin that downloaded the torrent
+        """
+        on_new_plugins = self.__plugins_of_type(self.__base.OnNewTorrentPlugin)
+        for plugin_name, plugin in on_new_plugins:
             try:
-                plugin.on_new_torrent_process(torrent_id, description,
-                                              server_plugin)
+                plugin.on_new_torrent_process(torrent, server_plugin)
             except BaseException as e:
                 plugin.log_error('Error while running on_new_torrent_process',
                                  e)
 
     def process_on_finish(self):
-        for plugin in self.on_finish_plugins:
+        """
+        Process all on-finish plugins. Should be called in the end of
+        the main process.
+        """
+        on_finish_plugins = self.__plugins_of_type(self.__base.OnFinishPlugin)
+        for plugin_name, plugin in on_finish_plugins:
             try:
                 plugin.on_finish_process()
             except BaseException as e:

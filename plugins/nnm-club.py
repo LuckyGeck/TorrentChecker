@@ -11,13 +11,28 @@ import urllib
 import base
 
 
+class NNMClubTorrent(base.Torrent):
+
+    def __init__(self):
+        base.Torrent.__init__(self)
+        self.group = None  # type: str
+        self.download_id = None  # type: str
+        self.seeders = 0
+        self.size = 0
+        self.tracker = NNMClub.get_plugin_name()
+
+    def __str__(self):
+        return '[{}.{}] {}'.format(self.tracker, self.id,
+                                   self.full_description)
+
+
 class NNMClub(base.ServerPlugin):
     tracker_host = 'nnmclub.to'
     re_search_item = re.compile(r'<tr\s*class="prow\d+">'
                                 r'.+?<a.*?class="gen"'
                                 r'.*?>(?P<group>.*?)<\/a>'
                                 r'.+?viewtopic\.php\?t=(?P<id>\d+)'
-                                r'.+?<b>(?P<name>.*?)<\/b>'
+                                r'.+?<b>(?P<full_description>.*?)<\/b>'
                                 r'.+?download\.php\?id=(?P<download_id>\d+)'
                                 r'.+?<u>(?P<size>\d+)<\/u>'
                                 r'.+?seedmed.+?<b>(?P<seeders>\d+)<\/b>.+?'
@@ -42,17 +57,8 @@ class NNMClub(base.ServerPlugin):
     def get_plugin_name():
         return 'nnm-club'
 
-    def get_server_name(self):
-        return 'nnm-club', 'nnmclub'
-
-    def get_auth_params(self):
-        return urllib.urlencode({
-            'username': self.login,
-            'password': self.password,
-            'autologin': 'on',
-            'redirect': '',
-            'login': '%C2%F5%EE%E4'
-        })
+    def can_process_torrent(self, torrent):
+        return torrent.tracker == self.get_plugin_name()
 
     def is_authorized(self, opener):
         template = 'http://{}/forum/watched_topics.php'
@@ -64,32 +70,39 @@ class NNMClub(base.ServerPlugin):
 
     def authorize(self, opener):
         login_page = 'http://{}/forum/login.php'.format(self.tracker_host)
-        opener.open(login_page, self.get_auth_params()).read()
+        auth_params = urllib.urlencode({
+            'username': self.login,
+            'password': self.password,
+            'autologin': 'on',
+            'redirect': '',
+            'login': '%C2%F5%EE%E4'
+        })
+        opener.open(login_page, auth_params).read()
 
-    def load_description(self, torrent_id):
-        url = self.get_topic_url(torrent_id)
+    def load_description(self, torrent):
+        url = self.get_topic_url(torrent)
         data = self.opener.open(url).read()
         title_tag = re.search(r"<h1 style=.*", data).group()
         title = re.split(r"<[^>]*>", title_tag)[2]
         return title.decode("cp1251")
 
-    def get_topic_url(self, torrent_id):
+    def get_topic_url(self, torrent):
         return 'http://{}/forum/viewtopic.php?t={}'.format(
-            self.tracker_host, torrent_id)
+            self.tracker_host, torrent.id)
 
-    def load_torrent(self, torrent_id):
+    def load_torrent_data(self, torrent):
         self.ensure_authorization()
-        self.log_debug('Fetching download URL for {}'.format(torrent_id))
-        topic_url = self.get_topic_url(torrent_id)
+        self.log_debug('Fetching download URL for {}'.format(torrent.id))
+        topic_url = self.get_topic_url(torrent)
         data = self.opener.open(topic_url).read()
         download_url = re.search(r'download\.php\?id=[^"]*', data).group()
-        self.log_debug('Loading torrent {}'.format(torrent_id))
+        self.log_debug('Loading torrent {}'.format(torrent.id))
         url = 'http://{}/forum/{}'.format(self.tracker_host, download_url)
-        data = self.opener.open(url).read()
-        self.log_debug('Torrent {} size: {}'.format(torrent_id, len(data)))
+        data = self.opener.open(url).read()  # type: str
+        self.log_debug('Torrent {} size: {}'.format(torrent.id, len(data)))
         return data
 
-    def search_url(self, query, types):
+    def __search_url(self, query, types):
         url_query = urllib.urlencode([
             ('nm', query),
             ('o', 10),
@@ -97,21 +110,24 @@ class NNMClub(base.ServerPlugin):
         url_template = 'http://{}/forum/tracker.php?{}'
         return url_template.format(self.tracker_host, url_query)
 
-    def find_torrents(self, query, type="movie"):
-        filter_types = self.filter_types.get(type)
+    def __load_search_page(self, query, category):
+        filter_types = self.filter_types.get(category)
         if not filter_types:
-            return []
+            return
         self.ensure_authorization()
-        url = self.search_url(query, filter_types)
+        url = self.__search_url(query, filter_types)
         self.log_debug('Search URL: {}'.format(url))
         page_data = self.opener.open(url).read()
         page = page_data.decode('windows-1251', 'ignore').encode('utf8')
         page = str(page).replace('\n', '')
-        torrents = []
+        return page
+
+    def find_torrents(self, query, category="new-movie"):
+        page = self.__load_search_page(query, category)
         for match in self.re_search_item.finditer(page):
-            torrent = match.groupdict()
-            torrents.append(torrent)
-        return torrents
+            torrent_dict = match.groupdict()
+            torrent = NNMClubTorrent.load(torrent_dict)
+            yield torrent
 
 
 if __name__ == '__main__':

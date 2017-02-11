@@ -11,6 +11,21 @@ import urllib
 import base
 
 
+class RuTrackerTorrent(base.Torrent):
+
+    def __init__(self):
+        base.Torrent.__init__(self)
+        self.group = None  # type: str
+        self.download_id = None  # type: str
+        self.seeders = 0
+        self.size = 0
+        self.tracker = RuTracker.get_plugin_name()
+
+    def __str__(self):
+        return '[{}.{}] {}'.format(self.tracker, self.id,
+                                   self.full_description)
+
+
 class RuTracker(base.ServerPlugin):
     tracker_host = 'rutracker.org'
     re_title = re.compile(r"<h1 class=[^>]*>\s*<a[^>]+>\s*(?P<name>.*)</a")
@@ -20,7 +35,7 @@ class RuTracker(base.ServerPlugin):
     re_search_item = re.compile(r'<tr\s+class="tCenter'
                                 r'.+?f=\d+">(?P<group>.+?)<\/a>'
                                 r'.+?viewtopic.php\?t=(?P<id>\d+)'
-                                r'[^>]+>(?P<name>.+?)<\/a>'
+                                r'[^>]+>(?P<full_description>.+?)<\/a>'
                                 r'.+?tor-size.+?<u>(?P<size>\d+)<\/u>'
                                 r'.+?seedmed[^>]+>(?P<seeders>\d+)<\/b>'
                                 r'.+?<\/tr>')
@@ -57,15 +72,8 @@ class RuTracker(base.ServerPlugin):
     def get_plugin_name():
         return 'rutracker'
 
-    def get_server_name(self):
-        return self.get_plugin_name()
-
-    def get_auth_params(self):
-        return urllib.urlencode({
-            'login_username': self.login,
-            'login_password': self.password,
-            'login': '%E2%F5%EE%E4'
-        })
+    def can_process_torrent(self, torrent):
+        return torrent.tracker == self.get_plugin_name()
 
     def is_authorized(self, opener):
         template = 'http://{}/forum/privmsg.php?folder=inbox'
@@ -77,30 +85,35 @@ class RuTracker(base.ServerPlugin):
 
     def authorize(self, opener):
         login_url = 'http://{}/forum/login.php'.format(self.tracker_host)
-        opener.open(login_url, self.get_auth_params()).read()
+        auth_params = urllib.urlencode({
+            'login_username': self.login,
+            'login_password': self.password,
+            'login': '%E2%F5%EE%E4'
+        })
+        opener.open(login_url, auth_params).read()
 
-    def load_description(self, torrent_id):
-        url = self.get_topic_url(torrent_id)
+    def load_description(self, torrent):
+        url = self.get_topic_url(torrent)
         data = self.opener.open(url).read()
         title = re.search(self.re_title, data).group("name")
         title = re.sub(self.re_tags, "", title)
         title = re.sub(self.re_quot, '"', title)
         return title.decode("cp1251")
 
-    def get_topic_url(self, torrent_id):
+    def get_topic_url(self, torrent):
         return 'http://{}/forum/viewtopic.php?t={}'.format(
-            self.tracker_host, torrent_id)
+            self.tracker_host, torrent.id)
 
-    def load_torrent(self, torrent_id):
+    def load_torrent_data(self, torrent):
         self.ensure_authorization()
-        self.log_debug('Loading torrent {}'.format(torrent_id))
+        self.log_debug('Loading torrent {}'.format(torrent.id))
         url = 'http://{}/forum/dl.php?t={}'.format(
-            self.tracker_host, torrent_id)
+            self.tracker_host, torrent.id)
         data = self.opener.open(url).read()
-        self.log_debug('Torrent {} size: {}'.format(torrent_id, len(data)))
+        self.log_debug('Torrent {} size: {}'.format(torrent.id, len(data)))
         return data
 
-    def search_url(self, query, types):
+    def __search_url(self, query, types):
         url_query = urllib.urlencode({
             'nm': query,
             'o': 10,
@@ -111,21 +124,24 @@ class RuTracker(base.ServerPlugin):
         url_template = 'http://{}/forum/tracker.php?{}'
         return url_template.format(self.tracker_host, url_query)
 
-    def find_torrents(self, query, type="movie"):
-        filter_types = self.filter_types.get(type)
+    def __load_page(self, query, category):
+        filter_types = self.filter_types.get(category)
         if not filter_types:
             return []
         self.ensure_authorization()
-        url = self.search_url(query, filter_types)
+        url = self.__search_url(query, filter_types)
         self.log_debug('Search URL: {}'.format(url))
         page_data = self.opener.open(url).read()
         page = page_data.decode('windows-1251', 'ignore').encode('utf8')
         page = str(page).replace('\n', '')
-        torrents = []
+        return page
+
+    def find_torrents(self, query, category="new-movie"):
+        page = self.__load_page(query, category)
         for match in self.re_search_item.finditer(page):
-            torrent = match.groupdict()
-            torrents.append(torrent)
-        return torrents
+            torrent_dict = match.groupdict()
+            torrent = RuTrackerTorrent.load(torrent_dict)
+            yield torrent
 
 
 if __name__ == '__main__':

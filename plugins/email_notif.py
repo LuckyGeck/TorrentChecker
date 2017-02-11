@@ -36,12 +36,14 @@ class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
     def get_plugin_name():
         return 'mailer'
 
-    def on_new_torrent_process(self, torrent_id, description, plugin_obj):
+    def on_new_torrent_process(self, torrent, plugin_obj):
         message = self.message_template.format(**locals())
 
         self.simple_body += message + '\n'
-        full_description = plugin_obj.load_description(torrent_id)
-        url = plugin_obj.get_topic_url(torrent_id)
+        torrent_id = torrent.id
+        description = torrent.description
+        full_description = plugin_obj.load_description(torrent)
+        url = plugin_obj.get_topic_url(torrent)
         body = self.table_template.format(**locals()).encode('utf-8')
         self.mail_body += body
 

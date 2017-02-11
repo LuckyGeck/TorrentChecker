@@ -18,13 +18,13 @@ class TwitterNotify(base.OnNewTorrentPlugin):
     def get_plugin_name():
         return 'twitter'
 
-    def on_new_torrent_process(self, torrent_id, description, plugin_obj):
+    def on_new_torrent_process(self, torrent, plugin_obj):
         import os
-        url = plugin_obj.get_topic_url(torrent_id)
-        message_args = {
-            "description": description,
+        url = plugin_obj.get_topic_url(torrent)
+        message_args = torrent.dump()
+        message_args.update({
             "url": url,
-        }
+        })
         message = self.message_template.format(**message_args)
         os.system('ttytter -status="{}"'.format(message))
 

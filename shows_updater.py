@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!./venv/bin/python
 # -*- coding: utf-8 -*-
 
 # Author:       Sychev Pavel
@@ -11,50 +11,40 @@ import json
 import hashlib
 from codecs import open
 
-from plugins import plugins
+from plugins import plugins, base
 from settings import settings
 
 
 def load_torrents_list(path, encoding):
-    return json.load(open(path, 'r', 'utf8'), encoding=encoding)
+    torrent_dicts = json.load(open(path, 'r', 'utf8'), encoding=encoding)
+    return map(base.Torrent.load, torrent_dicts)
 
 
 def save_torrents_list(torrents_list, path, encoding):
-    json_string = json.dump(torrents_list, open(path, 'w', 'utf8'),
-                            indent=4, encoding=encoding, ensure_ascii=False)
-
-
-def data_hash(data):
-    md5 = hashlib.md5()
-    md5.update(data)
-    return md5.hexdigest()
+    torrent_dicts = map(lambda t: t.dump(), torrents_list)
+    json.dump(torrent_dicts, open(path, 'w', 'utf8'),
+              indent=4, encoding=encoding, ensure_ascii=False)
 
 
 def process_torrent(torrent, save_as_tamplate):
-    plugin = plugins.servers.get(torrent["tracker"])
+    # type: (base.Torrent, str) -> base.Torrent
+    plugin = plugins.get_server_for_torrent(torrent)
     if not plugin:
-        msg = "No such server handler: {}".format(torrent["tracker"])
+        msg = "No such server handler: {}".format(torrent.tracker)
         raise Exception(msg)
 
-    torrent_id = torrent["id"]
-    description = torrent.get("description")
-    old_md5 = torrent.get("hash", "")
-    data = plugin.load_torrent(torrent_id)
-    new_md5 = data_hash(data)
-    if new_md5 == old_md5:
+    description = torrent.description
+    data = plugin.load_torrent_data(torrent)
+    new_torrent = torrent.copy()
+    new_torrent.update_hash_for_data(data)
+    if torrent.hash == new_torrent.hash:
         return torrent
 
-    print "Updated [{}] {}".format(torrent_id, description)
-    format_args = {
-        "torrent_id": torrent_id,
-        "plugin_name": plugin.get_plugin_name(),
-    }
-    file_name = save_as_tamplate.format(**format_args)
+    print "Updated [{}] {}".format(torrent.id, description)
+    file_name = save_as_tamplate.format(**torrent.dump())
     with open(file_name, 'wb') as torrent_file:
         torrent_file.write(data)
-    plugins.process_on_new_torrent(torrent_id, description, plugin)
-    new_torrent = torrent.copy()
-    new_torrent["hash"] = new_md5
+    plugins.process_on_new_torrent(new_torrent, plugin)
     return new_torrent
 
 

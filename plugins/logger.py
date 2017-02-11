@@ -24,21 +24,21 @@ class Logger(base.OnNewTorrentPlugin, base.OnFinishPlugin):
     def get_plugin_name():
         return 'logger'
 
-    def on_new_torrent_process(self, torrent_id, description, plugin_obj):
+    def on_new_torrent_process(self, torrent, plugin_obj):
         if self.use_json:
             self.log_list.append({
                 "time": int(time()),
-                "id": torrent_id,
-                "shortDescr": description,
-                "fullDescr": plugin_obj.load_description(torrent_id),
-                "url": plugin_obj.get_topic_url(torrent_id),
+                "id": torrent.id,
+                "shortDescr": torrent.description,
+                "fullDescr": plugin_obj.load_description(torrent),
+                "url": plugin_obj.get_topic_url(torrent),
                 "tracker": plugin_obj.get_plugin_name()
             })
         else:
             time_str = strftime("%Y-%m-%d %H:%M:%S", gmtime())
             template = u'[{}] --- Updated [{}] {}\n'
             log_line = template.format(
-                time_str, torrent_id, description
+                time_str, torrent.id, torrent.description
             )
             self.log_list.append(log_line)
 

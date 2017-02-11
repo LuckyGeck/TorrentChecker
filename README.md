@@ -98,7 +98,7 @@ Torrent Checker system
 2. Пропишите [API ключ](https://core.telegram.org/bots#6-botfather) вашего бота и [ваш username](https://telegram.org/faq#q-what-are-usernames-how-do-i-get-one) в `settings.json`.
 3. Выполните `python plugins/telegram_notif.py [token] [username]`, подставив туда данные, полученные выше.
 4. Напишите боту в Телеграм команду `/torrents`.
-5. Впишите полученный `chat_id` в соответствующее поле в `settings.py`.
+5. Впишите полученный `chat_id` в соответствующее поле в `settings.json`.
 
 ##
 *Приятного использования!*
