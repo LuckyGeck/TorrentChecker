@@ -1,10 +1,7 @@
 {
     "shows": {
         "save_as": "./[{plugin_name}].t{torrent_id}.torrent",
-        "list": {
-            "path": "./shows.json",
-            "enc": "utf8"
-        }
+        "list_path": "./shows.json"
     },
     "plugins": {
         "rutracker": {

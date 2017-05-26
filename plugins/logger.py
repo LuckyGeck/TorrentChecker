@@ -54,8 +54,7 @@ class Logger(base.OnNewTorrentPlugin, base.OnFinishPlugin):
             except:
                 pass
             new_log_list = old_log_content + self.log_list
-            log_text = dumps(new_log_list, indent=2, encoding='cp1251',
-                             ensure_ascii=False)
+            log_text = dumps(new_log_list, indent=2, ensure_ascii=False)
             f = codecs.open(self.log_path, 'w', 'utf-8')
             f.write(log_text)
             f.close()

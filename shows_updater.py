@@ -1,4 +1,4 @@
-#!./venv/bin/python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Author:       Sychev Pavel
@@ -15,15 +15,14 @@ from plugins import plugins, base
 from settings import settings
 
 
-def load_torrents_list(path, encoding):
-    torrent_dicts = json.load(open(path, 'r', 'utf8'), encoding=encoding)
+def load_torrents_list(path):
+    torrent_dicts = json.load(open(path, 'r'))
     return map(base.Torrent.load, torrent_dicts)
 
 
-def save_torrents_list(torrents_list, path, encoding):
+def save_torrents_list(torrents_list, path):
     torrent_dicts = map(lambda t: t.dump(), torrents_list)
-    json.dump(torrent_dicts, open(path, 'w', 'utf8'),
-              indent=4, encoding=encoding, ensure_ascii=False)
+    json.dump(torrent_dicts, open(path, 'w'), indent=4, ensure_ascii=False)
 
 
 def process_torrent(torrent, save_as_tamplate):
@@ -52,10 +51,9 @@ def main():
     plugins.load(settings["plugins"])
 
     shows_settings = settings["shows"]
-    torrents_list_path = shows_settings["list"]["path"]
-    encoding = shows_settings["list"].get("enc", "utf8")
+    torrents_list_path = shows_settings["list_path"]
     save_as_tamplate = shows_settings["save_as"]
-    torrents_list = load_torrents_list(torrents_list_path, encoding)
+    torrents_list = load_torrents_list(torrents_list_path)
     new_torrents_list = []
 
     plugins.process_on_start()
@@ -70,7 +68,7 @@ def main():
 
     plugins.process_on_finish()
 
-    save_torrents_list(new_torrents_list, torrents_list_path, encoding)
+    save_torrents_list(new_torrents_list, torrents_list_path)
 
 
 if __name__ == '__main__':
