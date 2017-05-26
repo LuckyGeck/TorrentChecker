@@ -18,7 +18,7 @@ class TwitterNotify(base.OnNewTorrentPlugin):
     def get_plugin_name():
         return 'twitter'
 
-    def on_new_torrent_process(self, torrent, plugin_obj):
+    def on_new_torrent(self, torrent, plugin_obj):
         import os
         url = plugin_obj.get_topic_url(torrent)
         message_args = torrent.dump()

@@ -36,7 +36,7 @@ class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
     def get_plugin_name():
         return 'mailer'
 
-    def on_new_torrent_process(self, torrent, plugin_obj):
+    def on_new_torrent(self, torrent, plugin_obj):
         message = self.message_template.format(**locals())
 
         self.simple_body += message + '\n'
@@ -47,7 +47,7 @@ class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
         body = self.table_template.format(**locals()).encode('utf-8')
         self.mail_body += body
 
-    def on_finish_process(self):
+    def on_finish(self):
         if len(self.mail_body) == 0:
             self.log_debug('Nothing to send')
             return

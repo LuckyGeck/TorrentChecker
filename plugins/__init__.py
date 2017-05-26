@@ -61,7 +61,7 @@ class PluginsContainer:
     def get_server(self, server_name):
         # type: (str) -> base.ServerPlugin
         """
-        Return server plugin with specific name
+        Returns a corresponding server plugin for a given 'server_name'.
         :param server_name: Server plugin name
         :return: Server plugin object
         """
@@ -73,7 +73,7 @@ class PluginsContainer:
     def get_server_for_torrent(self, torrent):
         # type: (base.Torrent) -> base.ServerPlugin
         """
-        Return server plugin that can process specific torrent
+        Returns a server plugin that can process a given torrent.
         :param torrent: Torrent object
         :return: Server plugin object
         """
@@ -84,40 +84,38 @@ class PluginsContainer:
 
     def process_on_start(self):
         """
-        Process all on-start plugins. Should be called in the beginning
-        of the main process.
+        Triggers 'on_start' for all registered plugins.
         """
         on_start_plugins = self.__plugins_of_type(self.__base.OnStartPlugin)
         for plugin_name, plugin in on_start_plugins:
             try:
-                plugin.on_start_process()
+                plugin.on_start()
             except BaseException as e:
                 plugin.log_error('Error while running on_start_process', e)
 
     def process_on_new_torrent(self, torrent, server_plugin):
         # type: (base.Torrent, base.ServerPlugin) -> None
         """
-        Process all plugins that handle new torrent loads.
+        Triggers 'on_new_torrent' for all registered plugins.
         :param torrent: Torrent object
         :param server_plugin: Plugin that downloaded the torrent
         """
         on_new_plugins = self.__plugins_of_type(self.__base.OnNewTorrentPlugin)
         for plugin_name, plugin in on_new_plugins:
             try:
-                plugin.on_new_torrent_process(torrent, server_plugin)
+                plugin.on_new_torrent(torrent, server_plugin)
             except BaseException as e:
                 plugin.log_error('Error while running on_new_torrent_process',
                                  e)
 
     def process_on_finish(self):
         """
-        Process all on-finish plugins. Should be called in the end of
-        the main process.
+        Triggers 'on_finish' for all registered plugins.
         """
         on_finish_plugins = self.__plugins_of_type(self.__base.OnFinishPlugin)
         for plugin_name, plugin in on_finish_plugins:
             try:
-                plugin.on_finish_process()
+                plugin.on_finish()
             except BaseException as e:
                 plugin.log_error('Error while running on_finish_process', e)
 

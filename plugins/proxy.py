@@ -20,7 +20,7 @@ class Proxy(base.OnStartPlugin):
     def get_plugin_name():
         return 'proxy'
 
-    def on_start_process(self):
+    def on_start(self):
         import urllib2
         pass_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
         pass_mgr.add_password(None, self.url, self.login, self.password)

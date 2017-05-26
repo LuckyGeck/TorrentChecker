@@ -7,8 +7,9 @@
 
 import sys
 from abc import ABCMeta, abstractmethod
-import urllib2
 import cookielib
+import hashlib
+import urllib2
 
 
 class Torrent(object):
@@ -39,7 +40,6 @@ class Torrent(object):
         return self.load(self.dump())
 
     def update_hash_for_data(self, data):
-        import hashlib
         md5 = hashlib.md5()
         md5.update(data)
         self.hash = md5.hexdigest()
@@ -129,9 +129,9 @@ class ServerPlugin(BasePlugin):
     def can_process_torrent(self, torrent):
         # type: (Torrent) -> bool
         """
-        Check if torrent could be processed with this plugin
+        Checks if the torrent can be processed by a current plugin.
         :param torrent: Torrent object
-        :return: True if torrent could be processed with this plugin
+        :return: True if torrent can be processed by a current plugin
         """
         pass
 
@@ -139,8 +139,8 @@ class ServerPlugin(BasePlugin):
     def is_authorized(self, opener):
         # type: (urllib2.OpenerDirector) -> bool
         """
-        Check authorization status(usually by trying to load resource not
-        allowed for guests)
+        Checks authorization status (usually by trying to load resource not
+        allowed for guests).
         :param opener: URL opener for network operations
         :return: True if authorised
         """
@@ -150,7 +150,7 @@ class ServerPlugin(BasePlugin):
     def authorize(self, opener):
         # type: (urllib2.OpenerDirector) -> None
         """
-        Perform authorization at torrent tracker
+        Authorizes on a torrent tracker.
         :param opener: URL opener for network operations
         """
         pass
@@ -159,7 +159,7 @@ class ServerPlugin(BasePlugin):
     def get_topic_url(self, torrent):
         # type: (Torrent) -> str
         """
-        Return absolute URL of torrent(topic)
+        Returns absolute URL for a torrent(topic)
         :param torrent: Torrent object
         :return: URL string
         """
@@ -169,7 +169,8 @@ class ServerPlugin(BasePlugin):
     def load_description(self, torrent):
         # type: (Torrent) -> str
         """
-        Load torrent description(title of a topic)
+        Loads a description for a given torrent (a title of a corresponding
+        topic).
         :param torrent: Torrent object
         :return: Description string
         """
@@ -179,18 +180,18 @@ class ServerPlugin(BasePlugin):
     def load_torrent_data(self, torrent):
         # type: (Torrent) -> str
         """
-        Load torrent file
+        Loads a contents of a given torrent file from a remote server.
         :param torrent: Torrent object
-        :return: Data of torrent file in string representation and
-            updated torrent state object
+        :return: Data of torrent file in string representation
         """
         pass
 
     @abstractmethod
     def find_torrents(self, query, category="new-movie"):
         """
-        Return torrents matching query and with specific type.
-        :param query: Query string for search
+        Returns torrents, that match a given query and are within a given
+        category.
+        :param query: Search string
         :param category: Category of torrent (see server plugins)
         :return Generator with matching torrent objects
         """
@@ -198,44 +199,33 @@ class ServerPlugin(BasePlugin):
 
 
 class OnStartPlugin(BasePlugin):
-    """
-    Base class for plugins that implement on-start logic like
-    something that is should be done before torrents checking process.
-    """
 
     @abstractmethod
-    def on_start_process(self):
+    def on_start(self):
         """
-        Called in the beginning of main process.
+        Does some preparations before the torrents' checking process.
         """
         pass
 
 
 class OnNewTorrentPlugin(BasePlugin):
-    """
-    Base class for plugins that handle a fact of new torrents downloading.
-    """
 
     @abstractmethod
-    def on_new_torrent_process(self, torrent, plugin_obj):
+    def on_new_torrent(self, torrent, plugin_obj):
         # type: (Torrent, ServerPlugin) -> None
         """
-        Called when new torrent downloaded.
+        Calls when new torrent downloaded.
         :param torrent: Torrent object
         :param plugin_obj: Server plugin that downloaded the torrent
-        :type plugin_obj: ServerPlugin
         """
         pass
 
 
 class OnFinishPlugin(BasePlugin):
-    """
-    Base class for plugins that have something to do in the end.
-    """
 
     @abstractmethod
-    def on_finish_process(self):
+    def on_finish(self):
         """
-        Called in the end of the main process.
+        Does some cleanup after the main workflow has ended.
         """
         pass

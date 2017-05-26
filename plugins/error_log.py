@@ -39,6 +39,6 @@ class ErrorLog(base.OnStartPlugin):
     def get_plugin_name():
         return 'error_log'
 
-    def on_start_process(self):
+    def on_start(self):
         import sys
         sys.stderr = ErrorFile(self.save_as)

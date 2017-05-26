@@ -24,7 +24,7 @@ class Logger(base.OnNewTorrentPlugin, base.OnFinishPlugin):
     def get_plugin_name():
         return 'logger'
 
-    def on_new_torrent_process(self, torrent, plugin_obj):
+    def on_new_torrent(self, torrent, plugin_obj):
         if self.use_json:
             self.log_list.append({
                 "time": int(time()),
@@ -42,7 +42,7 @@ class Logger(base.OnNewTorrentPlugin, base.OnFinishPlugin):
             )
             self.log_list.append(log_line)
 
-    def on_finish_process(self):
+    def on_finish(self):
         if len(self.log_list) == 0:
             return
         if self.use_json:
