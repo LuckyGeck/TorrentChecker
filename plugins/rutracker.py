@@ -127,7 +127,8 @@ class RuTracker(base.ServerPlugin):
     def __load_page(self, query, category):
         filter_types = self.filter_types.get(category)
         if not filter_types:
-            return []
+            self.log_debug('Unknown category: {}'.format(category))
+            return ''
         self.ensure_authorization()
         url = self.__search_url(query, filter_types)
         self.log_debug('Search URL: {}'.format(url))

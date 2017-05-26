@@ -92,12 +92,22 @@ class NNMClub(base.ServerPlugin):
 
     def load_torrent_data(self, torrent):
         self.ensure_authorization()
-        self.log_debug('Fetching download URL for {}'.format(torrent.id))
-        topic_url = self.get_topic_url(torrent)
-        data = self.opener.open(topic_url).read()
-        download_url = re.search(r'download\.php\?id=[^"]*', data).group()
+        download_id = None
+        if issubclass(torrent.__class__, NNMClubTorrent):
+            download_id = torrent.download_id
+        if not download_id:
+            self.log_debug('Fetching download ID for {}'.format(torrent.id))
+            topic_url = self.get_topic_url(torrent)
+            data = self.opener.open(topic_url).read()
+            match = re.search(r'download\.php\?id=(?P<id>[^"]*)', data)
+            if match:
+                download_id = match.groupdict()["id"]
+        if not download_id:
+            self.log_debug('Download ID not found')
+            return None
         self.log_debug('Loading torrent {}'.format(torrent.id))
-        url = 'http://{}/forum/{}'.format(self.tracker_host, download_url)
+        url_template = 'http://{}/forum/download.php?id={}'
+        url = url_template.format(self.tracker_host, download_id)
         data = self.opener.open(url).read()  # type: str
         self.log_debug('Torrent {} size: {}'.format(torrent.id, len(data)))
         return data
@@ -113,7 +123,10 @@ class NNMClub(base.ServerPlugin):
     def __load_search_page(self, query, category):
         filter_types = self.filter_types.get(category)
         if not filter_types:
-            return
+            msg_template = 'Unknown category: {} not in {}'
+            self.log_debug(msg_template.format(category,
+                                               self.filter_types.keys()))
+            return ''
         self.ensure_authorization()
         url = self.__search_url(query, filter_types)
         self.log_debug('Search URL: {}'.format(url))
