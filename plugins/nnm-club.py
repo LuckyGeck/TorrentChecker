@@ -133,7 +133,7 @@ class NNMClub(base.ServerPlugin):
         page_data = self.opener.open(url).read()
         page = page_data.decode('windows-1251', 'ignore').encode('utf8')
         page = str(page).replace('\n', '')
-        return page
+        return page.decode('utf8')
 
     def find_torrents(self, query, category="new-movie"):
         page = self.__load_search_page(query, category)
