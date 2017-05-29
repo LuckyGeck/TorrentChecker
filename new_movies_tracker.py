@@ -49,7 +49,7 @@ class Movie(object):
             size=float(self.size) / (1 << 30),
             seeders=self.seeders,
             quality=self.codec_q or self.quality,
-            name=self.orig_name
+            name=self.orig_name.encode('utf8')
         )
 
 
@@ -83,7 +83,7 @@ class NewMoviesTracker(object):
 
     def __process_torrent(self, torrent, plugin):
         movie = Movie(torrent)
-        key = movie.orig_name.decode('utf8')
+        key = movie.orig_name
         if key in self.loaded_movies_db:
             print '[!exst]', movie
             return
