@@ -57,7 +57,8 @@
         },
         "error_log": {
             "active": false,
-            "save_as": "./error.log"
+            "save_as": "./error.log",
+            "print_warn": true
         }
     }
 }
