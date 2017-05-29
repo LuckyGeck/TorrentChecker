@@ -38,6 +38,7 @@ def process_torrent(torrent, save_as_template):
     new_torrent.update_hash_for_data(data)
     if torrent.hash == new_torrent.hash:
         return torrent
+    new_torrent.full_description = plugin.load_description(torrent)
 
     print "Updated [{}] {}".format(torrent.id, description)
     file_name = save_as_template.format(**torrent.dump())
