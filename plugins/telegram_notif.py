@@ -31,7 +31,7 @@ class TelegramNotify(base.OnNewTorrentPlugin):
     def on_new_torrent(self, torrent, plugin_obj):
         import telegram
         bot = telegram.Bot(token=self.token)
-        url = plugin_obj.get_topic_url(torrent.id)
+        url = plugin_obj.get_topic_url(torrent)
         randomized_url = '{}&rnd={}'.format(url, rnd_str())
         msg_args = torrent.dump()
         msg_args.update({
