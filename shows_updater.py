@@ -25,7 +25,7 @@ def save_torrents_list(torrents_list, path):
     json.dump(torrent_dicts, open(path, 'w'), indent=4, ensure_ascii=False)
 
 
-def process_torrent(torrent, save_as_tamplate):
+def process_torrent(torrent, save_as_template):
     # type: (base.Torrent, str) -> base.Torrent
     plugin = plugins.get_server_for_torrent(torrent)
     if not plugin:
@@ -40,7 +40,7 @@ def process_torrent(torrent, save_as_tamplate):
         return torrent
 
     print "Updated [{}] {}".format(torrent.id, description)
-    file_name = save_as_tamplate.format(**torrent.dump())
+    file_name = save_as_template.format(**torrent.dump())
     with open(file_name, 'wb') as torrent_file:
         torrent_file.write(data)
     plugins.process_on_new_torrent(new_torrent, plugin)

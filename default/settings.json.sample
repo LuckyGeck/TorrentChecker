@@ -1,6 +1,6 @@
 {
     "shows": {
-        "save_as": "./[{plugin_name}].t{torrent_id}.torrent",
+        "save_as": "./[{tracker}].t{id}.torrent",
         "list_path": "./shows.json"
     },
     "plugins": {
