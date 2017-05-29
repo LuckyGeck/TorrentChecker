@@ -8,8 +8,8 @@
         "db_path": "./movies.json",
         "tracker": "nnm-club",
         "category": "new-movie",
-        "min-seeders": 400,
-        "min-size": 2300000000
+        "min_seeders": 400,
+        "min_size": 2300000000
     },
     "plugins": {
         "rutracker": {

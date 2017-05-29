@@ -60,8 +60,8 @@ class NewMoviesTracker(object):
         self.db_path = settings['db_path']
         self.tracker = settings['tracker']
         self.category = settings['category']
-        self.min_seeders = settings.get('min-seeders')
-        self.min_size = settings.get('min-size')
+        self.min_seeders = settings.get('min_seeders')
+        self.min_size = settings.get('min_size')
         self.loaded_movies_db = []
 
     def __load_db(self):
