@@ -22,7 +22,7 @@ def load_torrents_list(path):
 
 def save_torrents_list(torrents_list, path):
     torrent_dicts = map(lambda t: t.dump(), torrents_list)
-    json.dump(torrent_dicts, open(path, 'w'), indent=4, ensure_ascii=False)
+    json.dump(torrent_dicts, open(path, 'w'), indent=4)
 
 
 def process_torrent(torrent, save_as_template):
