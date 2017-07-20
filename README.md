@@ -2,31 +2,20 @@ Torrent Checker system
 ======================
 
 ## Перед первым запуском
-- Cоздайте файлы со своими настройками и списками торрентов: [`settings.py`](#settings), [`torrents.json`](#torrentList).
+- Создайте файлы со своими настройками и списком сериалов: [`settings.json`](#settings), [`shows.json`](#torrentList).
 
-Примеры файлов - `settings.py.sample`, `torrents.json.sample` лежат в папке `default`.
+Примеры файлов - `settings.json.sample`, `shows.json.sample` лежат в папке `default`.
 
 ## ФАЙЛ НАСТРОЕК
 
 ### Имя
-- `settings.py`
+- `settings.json`
 
 ### Расположение
-- в корне папки torrentChecker
+- В корне папки torrentChecker
 
-### Формат
-
-```python
-    settings = {
-        "название параметра 1" : "значение параметра 1",
-        "название параметра 2" : "значение параметра 2",
-        ...
-        "название параметра N" : "значение параметра N"
-    }
-```
-<a name="settings"></a>
-### Замечание:
-Пример файла находится тут: `default/settings.py.sample`
+### Установка
+Пример файла находится тут: `default/settings.json.sample`
 - Скопируйте в корневую папку файл (заменив имя файла на нужное)
 - Откройте файл текстовым редактором
 - Замените в нем на свои:
@@ -36,48 +25,30 @@ Torrent Checker system
     * логины и пароли для нужных вам торрент трекеров
 - Сохраните файл
 
-## ФАЙЛ СО СПИСКОМ ТОРРЕНТОВ
+## ФАЙЛ СО СПИСКОМ СЕРИАЛОВ
 
 ### Имя
-- `torrents.json`
+- `shows.json`
 
 ### Расположение
-- в корне папки torrentChecker
+- В корне папки torrentChecker
 
-<a name = "torrentFormat"></a>
-### Формат
-
-```json
-[
-  {
-    "tracker": "rutracker",
-    "hash": "e9c1a82537528e7053659807a002548b",
-    "id": "3747359",
-    "descr": "HIMYM s7"
-  },
-  ...
-  {
-    ...
-  }
-]
-```
-
-###### Каждый торрент описывается блоком вида:
+##### Каждый торрент описывается блоком вида
 
 ```json
 {
     "tracker": "tracker_name",
     "hash": "torrent hash",
     "id": "torrent id",
-    "descr": "your short description"
+    "description": "your short description"
 }
 ```
 
-###### Значения полей:
+##### Значения полей
 
 * `tracker`
     - Тут задается имя плагина, отвечающего за сервер, на котором лежит данный торрент.
-    - На данный момент поддериваются варианты:
+    - На данный момент поддерживаются варианты:
         + `"tracker" : "rutracker"` - *для [RuTracker.ORG](http://rutracker.org)*
         + `"tracker" : "nnm-club"` - *для [NoNaMe Club](http://nnmclub.to)*
 
@@ -100,23 +71,22 @@ Torrent Checker system
         + Тогда номер раздачи: `564504`
         + В файле строка будет выглядеть так: `"id" : "564504"`
 
-* `descr`
+* `description`
     - Тут задается краткое описание, которое поможет вам понять, какой торрент вы качаете и что обновилось.
     - К примеру:
         + Для раздачи [Теория Большого Взрыва | Сезон 6](http://nnmclub.to/forum/viewtopic.php?t=564504)
         + Описание можно написать такое: `ТБВ 6 сезон`
-        + В файле строка будет выглядеть так: `"descr" : "ТБВ 6 сезон"`
+        + В файле строка будет выглядеть так: `"description" : "ТБВ 6 сезон"`
 
-<a name="torrentList"></a>
-### Замечание:
-Пример файла находится тут: `default/torrents.json.sample`
+### Установка
+Пример файла находится тут: `default/shows.json.sample`
 - Скопируйте в корневую папку файл (заменив имя файла на нужное)
 - Откройте файл текстовым редактором
 - Добавьте в него список торрентов, за которыми хотите следить
     - *Написание блока, описывающего одну раздачу - по схеме, описанной [выше](#torrentFormat)*
 - Сохраните файл
 
-## Плагины:
+## Плагины
 
 ### Нотификации в Твиттер
 Для использования нотификаций в Твиттер, должен быть установлен и настроен консольный твиттер клиент ttytter!
@@ -125,9 +95,10 @@ Torrent Checker system
 Для использования нотификаций в Телеграм:
 
 1. Установите [python-telegram-bot](https://github.com/python-telegram-bot).
-2. Пропишите [API ключ](https://core.telegram.org/bots#6-botfather) вашего бота и [ваш username](https://telegram.org/faq#q-what-are-usernames-how-do-i-get-one) в `settings.py`.
-3. Выполните `python plugins_dir/telegram_notif.py [token] [username]`, подставив туда данные, полученные выше.
+2. Пропишите [API ключ](https://core.telegram.org/bots#6-botfather) вашего бота и [ваш username](https://telegram.org/faq#q-what-are-usernames-how-do-i-get-one) в `settings.json`.
+3. Выполните `python plugins/telegram_notif.py [token] [username]`, подставив туда данные, полученные выше.
 4. Напишите боту в Телеграм команду `/torrents`.
-5. Впишите полученный `chat_id` в соответствующее поле в `settings.py`.
+5. Впишите полученный `chat_id` в соответствующее поле в `settings.json`.
 
-### *Приятного использования!*
+##
+*Приятного использования!*

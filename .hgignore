@@ -1,9 +1,0 @@
-\.pyc$
-\.log$
-plugins_dir/.*\.pyc$
-_unsee/
-\.idea/
-torrents.json$
-settings.py$
-run
-killscr.py$

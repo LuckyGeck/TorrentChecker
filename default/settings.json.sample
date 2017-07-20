@@ -1,0 +1,64 @@
+{
+    "shows": {
+        "save_as": "./[{tracker}].t{id}.torrent",
+        "list_path": "./shows.json"
+    },
+    "plugins": {
+        "rutracker": {
+            "active": true,
+            "debug": false,
+            "auth": {
+                "login": "",
+                "password": ""
+            }
+        },
+        "nnm-club": {
+            "active": true,
+            "debug": false,
+            "auth": {
+                "login": "",
+                "password": ""
+            }
+        },
+        "mailer": {
+            "active": false,
+            "debug": false,
+            "smtp": {
+                "host": "smtp.gmail.com:587",
+                "ssl": false,
+                "tls": true,
+                "login": "",
+                "password": ""
+            },
+            "from_mail": "from@gmail.com",
+            "to_mail": "to@gmail.com"
+        },
+        "twitter": {
+            "active": false,
+            "message_template": "@username, there is a new episode of {description}"
+        },
+        "telegram": {
+            "active": false,
+            "token": "00000000:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "message_template": "There is a new episode of {description}.\n{url}",
+            "username": "username",
+            "chat_id": "0000000"
+        },
+        "proxy": {
+            "active": false,
+            "url": "http://proxy.url:port",
+            "login": "user",
+            "password": "password"
+        },
+        "logger": {
+            "active": true,
+            "use_json": true,
+            "save_as": "./work.log"
+        },
+        "error_log": {
+            "active": false,
+            "save_as": "./error.log",
+            "print_warn": true
+        }
+    }
+}
