@@ -27,7 +27,7 @@ class NNMClubTorrent(base.Torrent):
 
 
 class NNMClub(base.ServerPlugin):
-    tracker_host = 'nnmclub.to'
+    tracker_host = 'nnm-club.name'
     re_search_item = re.compile(r'<tr\s*class="prow\d+">'
                                 r'.+?<a.*?class="gen"'
                                 r'.*?>(?P<group>.*?)<\/a>'
