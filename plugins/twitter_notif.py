@@ -5,7 +5,7 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
-import base
+from plugins import base
 
 
 class TwitterNotify(base.OnNewTorrentPlugin):
@@ -29,4 +29,4 @@ class TwitterNotify(base.OnNewTorrentPlugin):
         os.system('ttytter -status="{}"'.format(message))
 
 if __name__ == '__main__':
-    print 'TwitterNotification Plugin'
+    print('TwitterNotification Plugin')

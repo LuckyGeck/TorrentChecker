@@ -17,11 +17,11 @@ from settings import settings
 
 def load_torrents_list(path):
     torrent_dicts = json.load(open(path, 'r'))
-    return map(base.Torrent.load, torrent_dicts)
+    return list(map(base.Torrent.load, torrent_dicts))
 
 
 def save_torrents_list(torrents_list, path):
-    torrent_dicts = map(lambda t: t.dump(), torrents_list)
+    torrent_dicts = list(map(lambda t: t.dump(), torrents_list))
     json.dump(torrent_dicts, open(path, 'w'), indent=4)
 
 
@@ -40,7 +40,7 @@ def process_torrent(torrent, save_as_template):
         return torrent
     new_torrent.full_description = plugin.load_description(torrent)
 
-    print "Updated [{}] {}".format(torrent.id, description)
+    print("Updated [{}] {}".format(torrent.id, description))
     file_name = save_as_template.format(**torrent.dump())
     with open(file_name, 'wb') as torrent_file:
         torrent_file.write(data)
@@ -64,7 +64,7 @@ def main():
         try:
             new_torrent = process_torrent(torrent, save_as_tamplate)
         except Exception as e:
-            print 'Torrent processing failure ({}): {}'.format(torrent, e)
+            print('Torrent processing failure ({}): {}'.format(torrent, e))
         new_torrents_list.append(new_torrent)
 
     plugins.process_on_finish()

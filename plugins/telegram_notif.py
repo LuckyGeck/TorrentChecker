@@ -5,7 +5,7 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
-import base
+from plugins import base
 
 
 def rnd_str(str_len=6):
@@ -66,7 +66,7 @@ def main():
         token = sys.argv[1]
         username = sys.argv[2]
     except:
-        print 'Usage: telegram_notif.py [token] [username]'
+        print('Usage: telegram_notif.py [token] [username]')
         exit(2)
     start_bot(token, username)
 

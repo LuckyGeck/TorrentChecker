@@ -6,9 +6,9 @@
 # Licence:      GPL
 
 import re
-import urllib
+from urllib.parse import urlencode
 
-import base
+from plugins import base
 
 
 class RuTrackerTorrent(base.Torrent):
@@ -28,6 +28,7 @@ class RuTrackerTorrent(base.Torrent):
 
 class RuTracker(base.ServerPlugin):
     tracker_host = 'rutracker.org'
+    tracker_encoding = "cp1251"
     re_title = re.compile(r"<h1 class=[^>]*>\s*<a[^>]+>\s*(?P<name>.*)</a")
     re_tags = re.compile(r"<[^>].*?>")
     re_quot = re.compile(r"&quot;")
@@ -85,7 +86,7 @@ class RuTracker(base.ServerPlugin):
 
     def authorize(self, opener):
         login_url = 'http://{}/forum/login.php'.format(self.tracker_host)
-        auth_params = urllib.urlencode({
+        auth_params = urlencode({
             'login_username': self.login,
             'login_password': self.password,
             'login': '%E2%F5%EE%E4'
@@ -94,11 +95,11 @@ class RuTracker(base.ServerPlugin):
 
     def load_description(self, torrent):
         url = self.get_topic_url(torrent)
-        data = self.opener.open(url).read()
+        data = self.opener.open(url).read().decode(self.tracker_encoding)
         title = re.search(self.re_title, data).group("name")
         title = re.sub(self.re_tags, "", title)
         title = re.sub(self.re_quot, '"', title)
-        return title.decode("cp1251")
+        return title
 
     def get_topic_url(self, torrent):
         return 'http://{}/forum/viewtopic.php?t={}'.format(
@@ -114,7 +115,7 @@ class RuTracker(base.ServerPlugin):
         return data
 
     def __search_url(self, query, types):
-        url_query = urllib.urlencode({
+        url_query = urlencode({
             'nm': query,
             'o': 10,
             's': 2,
@@ -133,8 +134,8 @@ class RuTracker(base.ServerPlugin):
         url = self.__search_url(query, filter_types)
         self.log_debug('Search URL: {}'.format(url))
         page_data = self.opener.open(url).read()
-        page = page_data.decode('windows-1251', 'ignore').encode('utf8')
-        page = str(page).replace('\n', '')
+        page = page_data.decode(self.tracker_encoding, 'ignore')
+        page = page.replace('\n', ' ')
         return page
 
     def find_torrents(self, query, category="new-movie"):
@@ -146,4 +147,4 @@ class RuTracker(base.ServerPlugin):
 
 
 if __name__ == '__main__':
-    print 'RuTracker Plugin'
+    print('RuTracker Plugin')

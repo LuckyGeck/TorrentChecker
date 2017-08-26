@@ -7,7 +7,7 @@
 
 from time import gmtime, strftime
 
-import base
+from plugins import base
 
 
 class ErrorFile:
@@ -23,7 +23,7 @@ class ErrorFile:
             self.print_warn = False
             self.out.write("\n\t[***] Error at '{}'\n"
                            .format(self.launch_time))
-            print "Error occurred! See '{}'".format(self.path)
+            print("Error occurred! See '{}'".format(self.path))
 
         self.out.write(*args)
 

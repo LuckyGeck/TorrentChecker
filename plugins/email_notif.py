@@ -5,7 +5,7 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
-import base
+from plugins import base
 
 
 class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
@@ -44,7 +44,7 @@ class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
         description = torrent.description
         full_description = plugin_obj.load_description(torrent)
         url = plugin_obj.get_topic_url(torrent)
-        body = self.table_template.format(**locals()).encode('utf-8')
+        body = self.table_template.format(**locals())
         self.mail_body += body
 
     def on_finish(self):
@@ -60,4 +60,4 @@ class EmailNotify(base.OnNewTorrentPlugin, base.OnFinishPlugin):
 
 
 if __name__ == '__main__':
-    print "Email sender plugin"
+    print("Email sender plugin")
