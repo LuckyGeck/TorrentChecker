@@ -4,6 +4,7 @@
 # Settings
 settings.json
 shows.json
+movies.json
 
 # Torrent files
 *.torrent

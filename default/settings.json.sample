@@ -3,6 +3,14 @@
         "save_as": "./[{tracker}].t{id}.torrent",
         "list_path": "./shows.json"
     },
+    "movies": {
+        "save_as": "./[{tracker}].movie.t{id}.torrent",
+        "db_path": "./movies.json",
+        "tracker": "nnm-club",
+        "category": "new-movie",
+        "min_seeders": 400,
+        "min_size": 2300000000
+    },
     "plugins": {
         "rutracker": {
             "active": true,
