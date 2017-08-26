@@ -11,7 +11,7 @@ from .base import *
 def _load_modules():
     import os
     import sys
-    import imp
+    import importlib.util
     modules = []
     plugins_dir = os.path.dirname(os.path.realpath(__file__))
     sys.path.append(plugins_dir)
@@ -22,7 +22,10 @@ def _load_modules():
             full_path = os.path.join(plugins_dir, path)
             module_name = filename
             if module_name not in ["base", "__init__"]:
-                module_obj = imp.load_source(module_name, full_path)
+                spec = importlib.util.spec_from_file_location(module_name,
+                                                              full_path)
+                module_obj = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(module_obj)
                 modules.append(module_obj)
     return modules
 
