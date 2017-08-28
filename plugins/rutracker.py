@@ -90,7 +90,7 @@ class RuTracker(base.ServerPlugin):
             'login_username': self.login,
             'login_password': self.password,
             'login': '%E2%F5%EE%E4'
-        })
+        }).encode()
         opener.open(login_url, auth_params).read()
 
     def load_description(self, torrent):

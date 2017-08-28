@@ -77,7 +77,7 @@ class NNMClub(base.ServerPlugin):
             'autologin': 'on',
             'redirect': '',
             'login': '%C2%F5%EE%E4'
-        })
+        }).encode()
         opener.open(login_page, auth_params).read()
 
     def load_description(self, torrent):
