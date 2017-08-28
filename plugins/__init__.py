@@ -6,8 +6,7 @@
 # Licence:      GPL
 import logging
 
-from plugins.base import BasePlugin, ServerPlugin, OnStartPlugin, Torrent, \
-    OnNewTorrentPlugin, OnFinishPlugin
+import plugins.base as base
 
 
 logger = logging.getLogger(__name__)
@@ -50,7 +49,7 @@ class PluginsContainer:
                 try:
                     cls = getattr(module_obj, elem)
                     if inspect.isclass(cls) and \
-                            issubclass(cls, BasePlugin):
+                            issubclass(cls, base.BasePlugin):
                         plugin_name = cls.get_plugin_name()
                         plugin_settings = settings.get(plugin_name, dict())
                         obj = cls(plugin_settings)
@@ -65,25 +64,25 @@ class PluginsContainer:
                 yield plugin_name, plugin
 
     def get_server(self, server_name):
-        # type: (str) -> ServerPlugin
+        # type: (str) -> base.ServerPlugin
         """
         Returns a corresponding server plugin for a given 'server_name'.
         :param server_name: Server plugin name
         :return: Server plugin object
         """
         plugin = self.__all_plugins.get(server_name)
-        is_server = issubclass(plugin.__class__, ServerPlugin)
+        is_server = issubclass(plugin.__class__, base.ServerPlugin)
         if plugin.active and is_server:
             return plugin
 
     def get_server_for_torrent(self, torrent):
-        # type: (base.Torrent) -> ServerPlugin
+        # type: (base.Torrent) -> base.ServerPlugin
         """
         Returns a server plugin that can process a given torrent.
         :param torrent: Torrent object
         :return: Server plugin object
         """
-        server_plugins = self.__plugins_of_type(ServerPlugin)
+        server_plugins = self.__plugins_of_type(base.ServerPlugin)
         for plugin_name, plugin in server_plugins:
             if plugin.can_process_torrent(torrent):
                 return plugin
@@ -92,7 +91,7 @@ class PluginsContainer:
         """
         Triggers 'on_start' for all registered plugins.
         """
-        on_start_plugins = self.__plugins_of_type(OnStartPlugin)
+        on_start_plugins = self.__plugins_of_type(base.OnStartPlugin)
         for plugin_name, plugin in on_start_plugins:
             try:
                 plugin.on_start()
@@ -100,13 +99,13 @@ class PluginsContainer:
                 plugin.log_error('Error while running on_start_process', e)
 
     def process_on_new_torrent(self, torrent, server_plugin):
-        # type: (Torrent, ServerPlugin) -> None
+        # type: (base.Torrent, base.ServerPlugin) -> None
         """
         Triggers 'on_new_torrent' for all registered plugins.
         :param torrent: Torrent object
         :param server_plugin: Plugin that downloaded the torrent
         """
-        on_new_plugins = self.__plugins_of_type(OnNewTorrentPlugin)
+        on_new_plugins = self.__plugins_of_type(base.OnNewTorrentPlugin)
         for plugin_name, plugin in on_new_plugins:
             try:
                 plugin.on_new_torrent(torrent, server_plugin)
@@ -118,7 +117,7 @@ class PluginsContainer:
         """
         Triggers 'on_finish' for all registered plugins.
         """
-        on_finish_plugins = self.__plugins_of_type(OnFinishPlugin)
+        on_finish_plugins = self.__plugins_of_type(base.OnFinishPlugin)
         for plugin_name, plugin in on_finish_plugins:
             try:
                 plugin.on_finish()
