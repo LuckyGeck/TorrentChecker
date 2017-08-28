@@ -7,7 +7,12 @@
 
 from time import gmtime, strftime
 
+import logging
+
 from plugins import base
+
+
+logger = logging.getLogger(__name__)
 
 
 class ErrorFile:
@@ -23,7 +28,7 @@ class ErrorFile:
             self.print_warn = False
             self.out.write("\n\t[***] Error at '{}'\n"
                            .format(self.launch_time))
-            print("Error occurred! See '{}'".format(self.path))
+            logger.warning("Error occurred! See '{}'".format(self.path))
 
         self.out.write(*args)
 

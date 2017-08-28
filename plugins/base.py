@@ -5,9 +5,9 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
-import sys
-from abc import ABCMeta, abstractmethod
 import hashlib
+import logging
+from abc import ABCMeta, abstractmethod
 from http.cookiejar import LWPCookieJar, FileCookieJar
 from urllib.request import OpenerDirector, HTTPCookieProcessor, build_opener
 
@@ -57,21 +57,18 @@ class BasePlugin(object):
     def __init__(self, settings):
         self.active = settings.get('active', False)
         self.debug = settings.get('debug', False)
+        self._logger = logging.getLogger(self.get_plugin_name())
 
-    def log_message(self, message, is_error=False):
-        msg = "[{} plugin] {}\n".format(self.get_plugin_name(), message)
-        if is_error:
-            sys.stderr.write(msg)
-        else:
-            sys.stdout.write(msg)
+    def log_message(self, message, level=logging.INFO):
+        self._logger.log(level, message)
 
     def log_debug(self, message):
         if self.debug:
-            self.log_message('[debug] {}'.format(message), True)
+            self.log_message(message, logging.DEBUG)
 
     def log_error(self, message, error):
         msg = "{}\n*** {} ***".format(message, error)
-        self.log_message(msg, True)
+        self.log_message(msg, logging.WARNING)
 
     @staticmethod
     @abstractmethod

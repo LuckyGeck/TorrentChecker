@@ -9,6 +9,8 @@ import datetime
 import os
 from time import sleep
 
+import logging
+
 from shows_updater import main as shows_updater
 from new_movies_tracker import main as new_movies_tracker
 
@@ -16,23 +18,31 @@ from new_movies_tracker import main as new_movies_tracker
 SLEEP_TIME = datetime.timedelta(
     seconds=int(os.environ.get('SLEEP_TIME', '3600'))
 )
+logger = logging.getLogger(__name__)
 
 
 def main():
     try:
         while True:
-            print(datetime.datetime.now())
+            logger.info(datetime.datetime.now())
 
-            print('Updating shows')
+            logger.info('Updating shows')
             shows_updater()
 
-            print('Loading new movies')
+            logger.info('Loading new movies')
             new_movies_tracker()
 
-            print('Sleep for {}'.format(SLEEP_TIME))
+            logger.info('Sleep for {}'.format(SLEEP_TIME))
             sleep(SLEEP_TIME.total_seconds())
     except KeyboardInterrupt:
         return
 
+
+def setup_logging():
+    logging_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(format=logging_format, level=logging.DEBUG)
+
+
 if __name__ == '__main__':
+    setup_logging()
     main()

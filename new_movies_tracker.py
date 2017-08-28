@@ -9,8 +9,13 @@
 import json
 import re
 
+import logging
+
 from plugins import plugins, base
 from settings import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class Movie(object):
@@ -85,16 +90,16 @@ class NewMoviesTracker(object):
         movie = Movie(torrent)
         key = movie.orig_name
         if key in self.loaded_movies_db:
-            print('[!exst] {}'.format(movie))
+            logger.info('[!exst] {}'.format(movie))
             return
         if self.min_seeders and movie.seeders < self.min_seeders:
-            print('[!seed] {}'.format(movie))
+            logger.info('[!seed] {}'.format(movie))
             return
         if self.min_size and movie.size < self.min_size:
-            print('[!size] {}'.format(movie))
+            logger.info('[!size] {}'.format(movie))
             return
 
-        print('      + {}'.format(movie))
+        logger.info('      + {}'.format(movie))
         self.__load_torrent(torrent, plugin)
         plugins.process_on_new_torrent(torrent, plugin)
         self.loaded_movies_db.append(key)
@@ -117,5 +122,12 @@ def main():
     tracker = NewMoviesTracker(settings["movies"])
     tracker.process()
 
+
+def setup_logging():
+    logging_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(format=logging_format, level=logging.DEBUG)
+
+
 if __name__ == '__main__':
+    setup_logging()
     main()
