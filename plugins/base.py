@@ -7,9 +7,9 @@
 
 import sys
 from abc import ABCMeta, abstractmethod
-import cookielib
 import hashlib
-import urllib2
+from http.cookiejar import LWPCookieJar, FileCookieJar
+from urllib.request import OpenerDirector, HTTPCookieProcessor, build_opener
 
 
 class Torrent(object):
@@ -94,13 +94,13 @@ class ServerPlugin(BasePlugin):
         default_cookies_file = './{}.cookies.txt'.format(plugin_name)
         self.cookies_file = settings.get('cookies_file', default_cookies_file)
 
-        self.opener = None  # type: urllib2.OpenerDirector
-        self.cookies = None  # type: cookielib.FileCookieJar
+        self.opener = None  # type: OpenerDirector
+        self.cookies = None  # type: FileCookieJar
 
     def __ensure_cookies_initialization(self):
         if self.cookies:
             return
-        cookies = cookielib.LWPCookieJar(self.cookies_file)
+        cookies = LWPCookieJar(self.cookies_file)
         try:
             cookies.load()
         except Exception as e:
@@ -110,8 +110,8 @@ class ServerPlugin(BasePlugin):
     def __ensure_opener_initialization(self):
         if self.opener:
             return
-        cookies_processor = urllib2.HTTPCookieProcessor(self.cookies)
-        self.opener = urllib2.build_opener(cookies_processor)
+        cookies_processor = HTTPCookieProcessor(self.cookies)
+        self.opener = build_opener(cookies_processor)
 
     def ensure_authorization(self):
         self.__ensure_cookies_initialization()
@@ -137,7 +137,7 @@ class ServerPlugin(BasePlugin):
 
     @abstractmethod
     def is_authorized(self, opener):
-        # type: (urllib2.OpenerDirector) -> bool
+        # type: (OpenerDirector) -> bool
         """
         Checks authorization status (usually by trying to load resource not
         allowed for guests).
@@ -148,7 +148,7 @@ class ServerPlugin(BasePlugin):
 
     @abstractmethod
     def authorize(self, opener):
-        # type: (urllib2.OpenerDirector) -> None
+        # type: (OpenerDirector) -> None
         """
         Authorizes on a torrent tracker.
         :param opener: URL opener for network operations

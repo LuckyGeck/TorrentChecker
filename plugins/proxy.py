@@ -4,8 +4,10 @@
 # Created:      22.01.2017
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
+from urllib.request import HTTPPasswordMgrWithDefaultRealm, \
+    ProxyBasicAuthHandler, ProxyHandler, build_opener, install_opener
 
-import base
+from plugins import base
 
 
 class Proxy(base.OnStartPlugin):
@@ -21,11 +23,10 @@ class Proxy(base.OnStartPlugin):
         return 'proxy'
 
     def on_start(self):
-        import urllib2
-        pass_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        pass_mgr = HTTPPasswordMgrWithDefaultRealm()
         pass_mgr.add_password(None, self.url, self.login, self.password)
-        auth_info = urllib2.ProxyBasicAuthHandler(pass_mgr)
-        proxy_support = urllib2.ProxyHandler({'http': self.url})
+        auth_info = ProxyBasicAuthHandler(pass_mgr)
+        proxy_support = ProxyHandler({'http': self.url})
 
-        opener = urllib2.build_opener(proxy_support, auth_info)
-        urllib2.install_opener(opener)
+        opener = build_opener(proxy_support, auth_info)
+        install_opener(opener)

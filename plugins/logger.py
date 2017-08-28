@@ -8,7 +8,7 @@
 from time import gmtime, strftime, time
 import codecs
 
-import base
+from plugins import base
 
 
 class Logger(base.OnNewTorrentPlugin, base.OnFinishPlugin):
@@ -64,4 +64,4 @@ class Logger(base.OnNewTorrentPlugin, base.OnFinishPlugin):
             f.close()
 
 if __name__ == '__main__':
-    print "Logging plugin"
+    print("Logging plugin")

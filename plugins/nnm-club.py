@@ -6,9 +6,9 @@
 # Licence:      GPL
 
 import re
-import urllib
+from urllib.parse import urlencode
 
-import base
+from plugins import base
 
 
 class NNMClubTorrent(base.Torrent):
@@ -28,6 +28,7 @@ class NNMClubTorrent(base.Torrent):
 
 class NNMClub(base.ServerPlugin):
     tracker_host = 'nnm-club.name'
+    tracker_encoding = "cp1251"
     re_search_item = re.compile(r'<tr\s*class="prow\d+">'
                                 r'.+?<a.*?class="gen"'
                                 r'.*?>(?P<group>.*?)<\/a>'
@@ -70,21 +71,21 @@ class NNMClub(base.ServerPlugin):
 
     def authorize(self, opener):
         login_page = 'http://{}/forum/login.php'.format(self.tracker_host)
-        auth_params = urllib.urlencode({
+        auth_params = urlencode({
             'username': self.login,
             'password': self.password,
             'autologin': 'on',
             'redirect': '',
             'login': '%C2%F5%EE%E4'
-        })
+        }).encode()
         opener.open(login_page, auth_params).read()
 
     def load_description(self, torrent):
         url = self.get_topic_url(torrent)
-        data = self.opener.open(url).read()
+        data = self.opener.open(url).read().decode(self.tracker_encoding)
         title_tag = re.search(r"<h1 style=.*", data).group()
         title = re.split(r"<[^>]*>", title_tag)[2]
-        return title.decode("cp1251")
+        return title
 
     def get_topic_url(self, torrent):
         return 'http://{}/forum/viewtopic.php?t={}'.format(
@@ -98,7 +99,8 @@ class NNMClub(base.ServerPlugin):
         if not download_id:
             self.log_debug('Fetching download ID for {}'.format(torrent.id))
             topic_url = self.get_topic_url(torrent)
-            data = self.opener.open(topic_url).read()
+            data = self.opener.open(topic_url).read()\
+                .decode(self.tracker_encoding)
             match = re.search(r'download\.php\?id=(?P<id>[^"]*)', data)
             if match:
                 download_id = match.groupdict()["id"]
@@ -108,12 +110,12 @@ class NNMClub(base.ServerPlugin):
         self.log_debug('Loading torrent {}'.format(torrent.id))
         url_template = 'http://{}/forum/download.php?id={}'
         url = url_template.format(self.tracker_host, download_id)
-        data = self.opener.open(url).read()  # type: str
+        data = self.opener.open(url).read()
         self.log_debug('Torrent {} size: {}'.format(torrent.id, len(data)))
         return data
 
     def __search_url(self, query, types):
-        url_query = urllib.urlencode([
+        url_query = urlencode([
             ('nm', query),
             ('o', 10),
         ] + [('f[]', t) for t in types])
@@ -131,9 +133,9 @@ class NNMClub(base.ServerPlugin):
         url = self.__search_url(query, filter_types)
         self.log_debug('Search URL: {}'.format(url))
         page_data = self.opener.open(url).read()
-        page = page_data.decode('windows-1251', 'ignore').encode('utf8')
-        page = str(page).replace('\n', '')
-        return page.decode('utf8')
+        page = page_data.decode(self.tracker_encoding, 'ignore')
+        page = page.replace('\n', ' ')
+        return page
 
     def find_torrents(self, query, category="new-movie"):
         page = self.__load_search_page(query, category)
@@ -144,4 +146,4 @@ class NNMClub(base.ServerPlugin):
 
 
 if __name__ == '__main__':
-    print 'NNM-Club Plugin'
+    print('NNM-Club Plugin')

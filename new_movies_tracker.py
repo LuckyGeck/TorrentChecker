@@ -33,7 +33,7 @@ class Movie(object):
             self.full_name = full["name"]
             self.year = full["year"]
             full_quality = full["quality"]
-            names = map(lambda s: s.strip(), self.full_name.split('/'))
+            names = list(map(lambda s: s.strip(), self.full_name.split('/')))
             self.orig_name = names[-1]
             self.name = names[0]
             quality_dict = self.quality_re.search(full_quality).groupdict()
@@ -49,7 +49,7 @@ class Movie(object):
             size=float(self.size) / (1 << 30),
             seeders=self.seeders,
             quality=self.codec_q or self.quality,
-            name=self.orig_name.encode('utf8')
+            name=self.orig_name
         )
 
 
@@ -85,16 +85,16 @@ class NewMoviesTracker(object):
         movie = Movie(torrent)
         key = movie.orig_name
         if key in self.loaded_movies_db:
-            print '[!exst]', movie
+            print('[!exst] {}'.format(movie))
             return
         if self.min_seeders and movie.seeders < self.min_seeders:
-            print '[!seed]', movie
+            print('[!seed] {}'.format(movie))
             return
         if self.min_size and movie.size < self.min_size:
-            print '[!size]', movie
+            print('[!size] {}'.format(movie))
             return
 
-        print '      +', movie
+        print('      + {}'.format(movie))
         self.__load_torrent(torrent, plugin)
         plugins.process_on_new_torrent(torrent, plugin)
         self.loaded_movies_db.append(key)

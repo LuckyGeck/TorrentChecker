@@ -55,13 +55,13 @@ def send_email(smtp_host, is_ssl, is_tls,
     server.login(login, password)
     server.sendmail(from_addr, to_addr, multi_msg.as_string())
     server.quit()
-    print 'Message sent!'
+    print('Message sent!')
 
 if __name__ == '__main__':
-    print '''Usage:
+    print('''Usage:
     import mailer
     ...
     creating body table:
     html_body = mailer.build_table(mail_body)
     ...
-    mailer.sendEmail('SMTPHost', 'FromMail', 'FromPassword', 'ToMail', html_body, simple_text_body)'''
+    mailer.sendEmail('SMTPHost', 'FromMail', 'FromPassword', 'ToMail', html_body, simple_text_body)''')
