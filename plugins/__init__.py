@@ -5,7 +5,8 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
-from .base import *
+from plugins.base import BasePlugin, ServerPlugin, OnStartPlugin, Torrent, \
+    OnNewTorrentPlugin, OnFinishPlugin
 
 
 def _load_modules():
@@ -60,7 +61,7 @@ class PluginsContainer:
                 yield plugin_name, plugin
 
     def get_server(self, server_name):
-        # type: (str) -> base.ServerPlugin
+        # type: (str) -> ServerPlugin
         """
         Returns a corresponding server plugin for a given 'server_name'.
         :param server_name: Server plugin name
@@ -72,7 +73,7 @@ class PluginsContainer:
             return plugin
 
     def get_server_for_torrent(self, torrent):
-        # type: (base.Torrent) -> base.ServerPlugin
+        # type: (base.Torrent) -> ServerPlugin
         """
         Returns a server plugin that can process a given torrent.
         :param torrent: Torrent object
@@ -95,7 +96,7 @@ class PluginsContainer:
                 plugin.log_error('Error while running on_start_process', e)
 
     def process_on_new_torrent(self, torrent, server_plugin):
-        # type: (base.Torrent, base.ServerPlugin) -> None
+        # type: (Torrent, ServerPlugin) -> None
         """
         Triggers 'on_new_torrent' for all registered plugins.
         :param torrent: Torrent object
