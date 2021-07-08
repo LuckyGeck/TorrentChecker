@@ -4,8 +4,12 @@
 # Created:      03.01.2017
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
+import logging
 
 import plugins.base as base
+
+
+logger = logging.getLogger(__name__)
 
 
 def _load_modules():
@@ -52,7 +56,7 @@ class PluginsContainer:
                         self.__all_plugins[plugin_name] = obj
                 except Exception as e:
                     msg = "***Error while loading plugin [{}.{}]***\n{}"
-                    print(msg.format(module_obj, elem, e))
+                    logger.warning(msg.format(module_obj, elem, e))
 
     def __plugins_of_type(self, base_class):
         for plugin_name, plugin in self.__all_plugins.items():

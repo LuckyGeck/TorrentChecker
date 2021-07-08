@@ -8,11 +8,15 @@
 
 
 import json
-import hashlib
 from codecs import open
+
+import logging
 
 from plugins import plugins, base
 from settings import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 def load_torrents_list(path):
@@ -40,7 +44,7 @@ def process_torrent(torrent, save_as_template):
         return torrent
     new_torrent.full_description = plugin.load_description(torrent)
 
-    print("Updated [{}] {}".format(torrent.id, description))
+    logger.info("Updated [{}] {}".format(torrent.id, description))
     file_name = save_as_template.format(**torrent.dump())
     with open(file_name, 'wb') as torrent_file:
         torrent_file.write(data)
@@ -64,7 +68,9 @@ def main():
         try:
             new_torrent = process_torrent(torrent, save_as_tamplate)
         except Exception as e:
-            print('Torrent processing failure ({}): {}'.format(torrent, e))
+            logger.warning('Torrent processing failure ({}): {}'.format(
+                torrent, e
+            ))
         new_torrents_list.append(new_torrent)
 
     plugins.process_on_finish()
@@ -72,5 +78,11 @@ def main():
     save_torrents_list(new_torrents_list, torrents_list_path)
 
 
+def setup_logging():
+    logging_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    logging.basicConfig(format=logging_format, level=logging.DEBUG)
+
+
 if __name__ == '__main__':
+    setup_logging()
     main()
