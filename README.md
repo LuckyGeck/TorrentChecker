@@ -1,39 +1,39 @@
 Torrent Checker system
 ======================
 
-## Перед первым запуском
-- Создайте файлы со своими настройками и списком сериалов: [`settings.json`](#settings), [`shows.json`](#torrentList).
+## Before First Run
+- Create your settings and show list files: [`settings.json`](#settings), [`shows.json`](#torrentList).
 
-Примеры файлов - `settings.json.sample`, `shows.json.sample` лежат в папке `default`.
+Sample files — `settings.json.sample`, `shows.json.sample` — are located in the `default` folder.
 
-## ФАЙЛ НАСТРОЕК
+## SETTINGS FILE
 
-### Имя
+### Name
 - `settings.json`
 
-### Расположение
-- В корне папки torrentChecker
+### Location
+- In the root of the torrentChecker folder
 
-### Установка
-Пример файла находится тут: `default/settings.json.sample`
-- Скопируйте в корневую папку файл (заменив имя файла на нужное)
-- Откройте файл текстовым редактором
-- Замените в нем на свои:
-    * пути к папке для закачки торрентов
-    * пути для логов
-    * пути для сообщений об ошибках
-    * логины и пароли для нужных вам торрент трекеров
-- Сохраните файл
+### Setup
+A sample file is located at: `default/settings.json.sample`
+- Copy the file to the root folder (renaming it as needed)
+- Open the file in a text editor
+- Replace the following with your own values:
+    * paths to the folder for downloading torrents
+    * paths for logs
+    * paths for error messages
+    * login credentials for the torrent trackers you use
+- Save the file
 
-## ФАЙЛ СО СПИСКОМ СЕРИАЛОВ
+## SHOW LIST FILE
 
-### Имя
+### Name
 - `shows.json`
 
-### Расположение
-- В корне папки torrentChecker
+### Location
+- In the root of the torrentChecker folder
 
-##### Каждый торрент описывается блоком вида
+##### Each torrent is described by a block like this
 
 ```json
 {
@@ -44,61 +44,61 @@ Torrent Checker system
 }
 ```
 
-##### Значения полей
+##### Field descriptions
 
 * `tracker`
-    - Тут задается имя плагина, отвечающего за сервер, на котором лежит данный торрент.
-    - На данный момент поддерживаются варианты:
-        + `"tracker" : "rutracker"` - *для [RuTracker.ORG](http://rutracker.org)*
-        + `"tracker" : "nnm-club"` - *для [NoNaMe Club](http://nnmclub.to)*
+    - Specifies the name of the plugin responsible for the server where the torrent is hosted.
+    - Currently supported options:
+        + `"tracker" : "rutracker"` - *for [RuTracker.ORG](http://rutracker.org)*
+        + `"tracker" : "nnm-club"` - *for [NoNaMe Club](http://nnmclub.to)*
 
 * `hash`
-    - Это системная информация, по которой опеределяется, изменилась ли раздача с момента последнего скачивания.
-    - При добавлении нового торрента - задаем произвольное значние.
-        + К примеру так: `"hash" : ""`
-    - В последствии - *НЕ ИЗМЕНЯТЬ РУКАМИ!*
-        + **Ex**: `"hash" : "e9c1a82537528e7053659807a002548b"` - *md5-hash для раздачи*
+    - System information used to determine whether the torrent has changed since the last download.
+    - When adding a new torrent, set an arbitrary value.
+        + For example: `"hash" : ""`
+    - Afterwards — *DO NOT MODIFY MANUALLY!*
+        + **Ex**: `"hash" : "e9c1a82537528e7053659807a002548b"` - *md5 hash of the torrent*
 
 * `id`
-    - Тут задается номер данной раздачи на торрент-трекере.
-    - Для каждого трекера номера могут быть в разном формате.
-    - Для раздачи с [RuTracker.ORG](http://rutracker.org):
-        + Ссылка на раздачу: `http://rutracker.org/forum/viewtopic.php?t=3747359`
-        + Тогда номер раздачи: `3747359`
-        + В файле строка будет выглядеть так: `"id" : "3747359"`
-    - Для раздачи с [NoNaMe Club](http://nnm-club.ru):
-        + Ссылка на раздачу: `http://nnmclub.to/forum/viewtopic.php?t=564504`
-        + Тогда номер раздачи: `564504`
-        + В файле строка будет выглядеть так: `"id" : "564504"`
+    - The ID of the torrent on the tracker.
+    - The format of the ID may differ between trackers.
+    - For a torrent on [RuTracker.ORG](http://rutracker.org):
+        + Topic URL: `http://rutracker.org/forum/viewtopic.php?t=3747359`
+        + Torrent ID: `3747359`
+        + The line in the file will look like: `"id" : "3747359"`
+    - For a torrent on [NoNaMe Club](http://nnm-club.ru):
+        + Topic URL: `http://nnmclub.to/forum/viewtopic.php?t=564504`
+        + Torrent ID: `564504`
+        + The line in the file will look like: `"id" : "564504"`
 
 * `description`
-    - Тут задается краткое описание, которое поможет вам понять, какой торрент вы качаете и что обновилось.
-    - К примеру:
-        + Для раздачи [Теория Большого Взрыва | Сезон 6](http://nnmclub.to/forum/viewtopic.php?t=564504)
-        + Описание можно написать такое: `ТБВ 6 сезон`
-        + В файле строка будет выглядеть так: `"description" : "ТБВ 6 сезон"`
+    - A short description to help you identify which torrent you are tracking and what was updated.
+    - For example:
+        + For the torrent [The Big Bang Theory | Season 6](http://nnmclub.to/forum/viewtopic.php?t=564504)
+        + You could write: `TBBT Season 6`
+        + The line in the file will look like: `"description" : "TBBT Season 6"`
 
-### Установка
-Пример файла находится тут: `default/shows.json.sample`
-- Скопируйте в корневую папку файл (заменив имя файла на нужное)
-- Откройте файл текстовым редактором
-- Добавьте в него список торрентов, за которыми хотите следить
-    - *Написание блока, описывающего одну раздачу - по схеме, описанной [выше](#torrentFormat)*
-- Сохраните файл
+### Setup
+A sample file is located at: `default/shows.json.sample`
+- Copy the file to the root folder (renaming it as needed)
+- Open the file in a text editor
+- Add the list of torrents you want to track
+    - *Each torrent block follows the format described [above](#torrentFormat)*
+- Save the file
 
-## Плагины
+## Plugins
 
-### Нотификации в Твиттер
-Для использования нотификаций в Твиттер, должен быть установлен и настроен консольный твиттер клиент ttytter!
+### Twitter Notifications
+To use Twitter notifications, the console Twitter client ttytter must be installed and configured.
 
-### Нотификации в Телеграм
-Для использования нотификаций в Телеграм:
+### Telegram Notifications
+To use Telegram notifications:
 
-1. Установите [python-telegram-bot](https://github.com/python-telegram-bot).
-2. Пропишите [API ключ](https://core.telegram.org/bots#6-botfather) вашего бота и [ваш username](https://telegram.org/faq#q-what-are-usernames-how-do-i-get-one) в `settings.json`.
-3. Выполните `python plugins/telegram_notif.py [token] [username]`, подставив туда данные, полученные выше.
-4. Напишите боту в Телеграм команду `/torrents`.
-5. Впишите полученный `chat_id` в соответствующее поле в `settings.json`.
+1. Install [python-telegram-bot](https://github.com/python-telegram-bot).
+2. Set the [API token](https://core.telegram.org/bots#6-botfather) of your bot and [your username](https://telegram.org/faq#q-what-are-usernames-how-do-i-get-one) in `settings.json`.
+3. Run `python plugins/telegram_notif.py [token] [username]`, substituting the values from above.
+4. Send the command `/torrents` to your bot in Telegram.
+5. Enter the received `chat_id` in the corresponding field in `settings.json`.
 
 ##
-*Приятного использования!*
+*Enjoy using it!*
