@@ -48,11 +48,10 @@ class Torrent(object):
         return '[{}.{}] {}'.format(self.tracker, self.id, self.description)
 
 
-class BasePlugin(object):
+class BasePlugin(metaclass=ABCMeta):
     """
     Base class for all plugins
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, settings):
         self.active = settings.get('active', False)

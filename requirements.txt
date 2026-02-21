@@ -1,6 +1,5 @@
 certifi==2026.1.4
 chardet==5.2.0
-future==1.0.0
 idna==3.11
 python-telegram-bot==22.6
 urllib3==2.6.3
