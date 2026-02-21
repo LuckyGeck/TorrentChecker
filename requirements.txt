@@ -1,7 +1,5 @@
-certifi==2017.7.27.1
-chardet==3.0.4
-future==0.16.0
-idna==2.6
-python-telegram-bot==7.0.1
-telegram==0.0.1
-urllib3==1.26.5
+certifi==2026.1.4
+chardet==5.2.0
+idna==3.11
+python-telegram-bot==22.6
+urllib3==2.6.3

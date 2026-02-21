@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Author:       Sychev Pavel
@@ -9,7 +9,6 @@
 
 import json
 import hashlib
-from codecs import open
 
 from plugins import plugins, base
 from settings import settings

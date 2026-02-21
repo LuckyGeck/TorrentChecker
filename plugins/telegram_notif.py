@@ -5,6 +5,8 @@
 # Copyright:    (c) Sychev Pavel 2017
 # Licence:      GPL
 
+import asyncio
+
 from plugins import base
 
 
@@ -29,8 +31,7 @@ class TelegramNotify(base.OnNewTorrentPlugin):
         return 'telegram'
 
     def on_new_torrent(self, torrent, plugin_obj):
-        import telegram
-        bot = telegram.Bot(token=self.token)
+        from telegram import Bot
         url = plugin_obj.get_topic_url(torrent)
         randomized_url = '{}&rnd={}'.format(url, rnd_str())
         msg_args = torrent.dump()
@@ -38,25 +39,27 @@ class TelegramNotify(base.OnNewTorrentPlugin):
             "url": randomized_url,
         })
         msg = self.message_template.format(**msg_args)
-        bot.sendMessage(chat_id=self.chat_id, text=msg)
+
+        async def _send():
+            async with Bot(self.token) as bot:
+                await bot.send_message(chat_id=self.chat_id, text=msg)
+
+        asyncio.run(_send())
 
 
 def start_bot(token, username):
-    from telegram.ext import Updater, CommandHandler
-    updater = Updater(token)
+    from telegram.ext import Application, CommandHandler
 
-    def echo(bot, update):
+    async def echo(update, context):
         chat = update.message.chat
-        if chat['username'] == username:
-            msg = 'Your chat_id is "{}"'.format(chat['id'])
-            update.message.reply_text(msg)
-            exit(0)
-    handler = CommandHandler("torrents", echo)
+        if chat.username == username:
+            msg = 'Your chat_id is "{}"'.format(chat.id)
+            await update.message.reply_text(msg)
 
-    updater.dispatcher.add_handler(handler)
-    updater.start_polling()
+    app = Application.builder().token(token).build()
+    app.add_handler(CommandHandler("torrents", echo))
     print('Waiting for command "/torrents"...')
-    updater.idle()
+    app.run_polling()
 
 
 def main():
